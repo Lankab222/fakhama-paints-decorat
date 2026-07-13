@@ -1,0 +1,38 @@
+html,
+body {
+  direction: ltr;
+}
+
+/* النصوص العربية داخل الحقول */
+input,
+textarea,
+[contenteditable="true"] {
+  direction: rtl;
+  text-align: right;
+  font-family: "Cairo", Arial, sans-serif;
+}
+
+/* عناوين الحقول والنصوص */
+label,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Cairo", Arial, sans-serif;
+}
+
+/* محرر Markdown */
+[data-slate-editor="true"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* معاينة المحتوى */
+[class*="PreviewPane"],
+[class*="preview"] {
+  direction: rtl;
+  text-align: right;
+}

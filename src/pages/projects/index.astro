@@ -1,0 +1,165 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/common/PageHero.astro";
+
+const projects = (await getCollection("projects"))
+  .filter((project) => !project.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="المشاريع"
+  description="معرض لأبرز المشاريع والأعمال المنفذة."
+>
+  <main>
+    <PageHero
+  eyebrow="معرض الأعمال"
+  title="مشاريع نفخر بتنفيذها"
+  description="نماذج مختارة من المشاريع التي توضح جودة التصميم ودقة التنفيذ والاهتمام بالتفاصيل."
+/>
+
+    <section class="section">
+      <div class="container">
+        {
+          projects.length > 0 ? (
+            <div class="projects-grid">
+              {projects.map((project) => (
+                <article class="project-card">
+                  {project.data.coverImage && (
+                    <a
+                      href={`/projects/${project.id}/`}
+                      class="project-card__image-link"
+                    >
+                      <img
+                        class="project-card__image"
+                        src={project.data.coverImage}
+                        alt={
+                          project.data.coverImageAlt ||
+                          project.data.title
+                        }
+                        width="800"
+                        height="600"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </a>
+                  )}
+
+                  <div class="project-card__content">
+                    <span>{project.data.category}</span>
+
+                    <h2>
+                      <a href={`/projects/${project.id}/`}>
+                        {project.data.title}
+                      </a>
+                    </h2>
+
+                    <p>{project.data.description}</p>
+
+                    <a
+                      class="project-card__link"
+                      href={`/projects/${project.id}/`}
+                    >
+                      عرض المشروع
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>لا توجد مشاريع منشورة حاليًا.</p>
+          )
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .service-card,
+.project-card,
+.post-card {
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition);
+}
+
+.service-card:hover,
+.project-card:hover,
+.post-card:hover {
+  transform: translateY(-4px);
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-primary) 28%,
+      var(--color-border)
+    );
+  box-shadow: var(--shadow-md);
+}
+  .projects-grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .project-card {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .project-card__image-link {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+  }
+
+  .project-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition);
+  }
+
+  .project-card:hover .project-card__image {
+    transform: scale(1.03);
+  }
+
+  .project-card__content {
+    padding: 1.5rem;
+  }
+
+  .project-card__content > span {
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .project-card h2 {
+    margin-block: 0.65rem;
+  }
+
+  .project-card p {
+    color: var(--color-text-muted);
+  }
+
+  .project-card__link {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  @media (min-width: 768px) {
+    .projects-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .projects-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+import JsonLd from "./JsonLd.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+  publishedTime: Date | string;
+  modifiedTime?: Date | string;
+  author: string;
+  siteName: string;
+  logo: string;
+}
+
+const {
+  title,
+  description,
+  url,
+  image,
+  publishedTime,
+  modifiedTime,
+  author,
+  siteName,
+  logo,
+} = Astro.props;
+
+const toIso = (value: Date | string) =>
+  value instanceof Date
+    ? value.toISOString()
+    : new Date(value).toISOString();
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+
+  headline: title,
+  description,
+  mainEntityOfPage: url,
+
+  image: [image],
+
+  datePublished: toIso(publishedTime),
+
+  dateModified: modifiedTime
+    ? toIso(modifiedTime)
+    : toIso(publishedTime),
+
+  author: {
+    "@type": "Person",
+    name: author,
+  },
+
+  publisher: {
+    "@type": "Organization",
+    name: siteName,
+    logo: {
+      "@type": "ImageObject",
+      url: logo,
+    },
+  },
+
+  inLanguage: "ar",
+};
+---
+
+<JsonLd data={schema} />

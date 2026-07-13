@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getEntry } from "astro:content";
+import PageHero from "../components/common/PageHero.astro";
+
+const settingsEntry = await getEntry("settings", "site");
+
+if (!settingsEntry) {
+  throw new Error("ملف إعدادات الموقع غير موجود");
+}
+
+const settings = settingsEntry.data;
+---
+
+<BaseLayout
+  title="اتصل بنا"
+  description="تواصل معنا للاستفسار أو طلب إحدى خدماتنا."
+  pageType="ContactPage"
+>
+  <main>
+    <PageHero
+  eyebrow="اتصل بنا"
+  title="يسعدنا تواصلك معنا"
+  description="تواصل معنا لطلب خدمة، مناقشة مشروع جديد، أو للحصول على استشارة أولية."
+/>
+    <section class="section">
+      <div class="container contact-layout">
+        <div class="contact-intro">
+      <h2>طرق التواصل</h2>
+
+      <p>
+        اختر وسيلة التواصل المناسبة، وسنحرص على الرد عليك
+        في أقرب وقت.
+      </p>
+    </div>
+
+        <div class="contact-card">
+          {settings.phone && (
+            <a href={`tel:${settings.phone}`}>
+              <strong>الهاتف</strong>
+              <span>{settings.phone}</span>
+            </a>
+          )}
+
+          {settings.whatsapp && (
+            <a
+              href={`https://wa.me/${settings.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <strong>واتساب</strong>
+              <span>{settings.whatsapp}</span>
+            </a>
+          )}
+
+          {settings.email && (
+            <a href={`mailto:${settings.email}`}>
+              <strong>البريد الإلكتروني</strong>
+              <span>{settings.email}</span>
+            </a>
+          )}
+
+          {settings.address && (
+            <div>
+              <strong>العنوان</strong>
+              <span>{settings.address}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .contact-intro h2 {
+  margin-bottom: 0.75rem;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+}
+
+.contact-intro p {
+  color: var(--color-text-muted);
+}
+  .contact-layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .eyebrow {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  h1 {
+    margin-block: 0.75rem 1rem;
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    line-height: 1.2;
+  }
+
+  p {
+    color: var(--color-text-muted);
+  }
+
+  .contact-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .contact-card a,
+  .contact-card div {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+  }
+
+  .contact-card span {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 900px) {
+    .contact-layout {
+      grid-template-columns: 1fr 420px;
+      align-items: start;
+    }
+  }
+</style>

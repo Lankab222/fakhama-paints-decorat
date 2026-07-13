@@ -1,0 +1,128 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/common/PageHero.astro";
+import { getEntry } from "astro:content";
+
+const settingsEntry = await getEntry("settings", "site");
+
+if (!settingsEntry) {
+  throw new Error("ملف إعدادات الموقع غير موجود");
+}
+
+const settings = settingsEntry.data;
+---
+
+<BaseLayout
+  title="من نحن"
+  description="تعرف على خبرتنا ونهجنا في تصميم وتطوير المواقع العربية السريعة والمتوافقة مع محركات البحث."
+  pageType="AboutPage"
+>
+  <main>
+    <PageHero
+      eyebrow="من نحن"
+      title={settings.aboutTitle}
+      description={settings.aboutDescription}
+      image={settings.aboutImage}
+      imageAlt={settings.aboutImageAlt}
+    />
+
+    <section class="section">
+      <div class="container about-page">
+        <div class="about-page__content">
+          <h2>نهتم بالتفاصيل التي تصنع الفرق</h2>
+
+          <p>
+            نطوّر مواقع عربية حديثة وسريعة، مع التركيز على سهولة
+            الاستخدام، الأداء، وتحسين الظهور في محركات البحث.
+          </p>
+
+          <p>
+            يعتمد عملنا على تقنيات حديثة مثل Astro وDecap CMS،
+            مع بنية قابلة للتوسع والنشر عبر Cloudflare Pages.
+          </p>
+        </div>
+
+        {
+          settings.aboutFeatures.length > 0 && (
+            <div class="about-page__features">
+              {settings.aboutFeatures.map((feature) => (
+                <article>
+                  <span aria-hidden="true">✓</span>
+                  <h3>{feature}</h3>
+                </article>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .about-page {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .about-page__content {
+    max-width: 760px;
+  }
+
+  .about-page__content h2 {
+    font-size: clamp(1.9rem, 5vw, 3rem);
+  }
+
+  .about-page__content p {
+    color: var(--color-text-muted);
+    font-size: 1.075rem;
+  }
+
+  .about-page__features {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .about-page__features article {
+    padding: 1.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .about-page__features span {
+    display: grid;
+    width: 2.2rem;
+    height: 2.2rem;
+    place-items: center;
+    margin-bottom: 0.9rem;
+    border-radius: 50%;
+    background:
+      color-mix(
+        in srgb,
+        var(--color-primary) 12%,
+        transparent
+      );
+    color: var(--color-primary);
+    font-weight: 900;
+  }
+
+  .about-page__features h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .about-page__features {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .about-page {
+      grid-template-columns:
+        minmax(0, 1.2fr)
+        minmax(340px, 0.8fr);
+    }
+  }
+</style>

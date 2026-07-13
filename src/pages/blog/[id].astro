@@ -1,0 +1,274 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getEntry } from "astro:content";
+import ArticleSchema from "../../components/schema/ArticleSchema.astro";
+import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
+import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
+import ShareButtons from "../../components/blog/ShareButtons.astro";
+import RelatedPosts from "../../components/blog/RelatedPosts.astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: {
+      id: post.id,
+    },
+    props: {
+      post,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const relatedPosts = (await getCollection("blog"))
+  .filter(
+    (item) =>
+      !item.data.draft &&
+      item.id !== post.id &&
+      (
+        item.data.category === post.data.category ||
+        item.data.tags.some((tag) =>
+          post.data.tags.includes(tag),
+        )
+      ),
+  )
+  .sort(
+    (a, b) =>
+      b.data.publishDate.getTime() -
+      a.data.publishDate.getTime(),
+  )
+  .slice(0, 3);
+
+const settingsEntry = await getEntry("settings", "site");
+
+if (!settingsEntry) {
+  throw new Error("ملف إعدادات الموقع غير موجود");
+}
+
+const settings = settingsEntry.data;
+
+const articleUrl = new URL(
+  `/blog/${post.id}/`,
+  settings.siteUrl,
+).toString();
+
+const articleImage = new URL(
+  post.data.image || settings.defaultImage,
+  settings.siteUrl,
+).toString();
+
+const logoUrl = new URL(
+  settings.logo || "/favicon.svg",
+  settings.siteUrl,
+).toString();
+
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={
+    post.data.image ||
+    settings.defaultImage
+  }
+  type="article"
+  publishedTime={post.data.publishDate}
+  modifiedTime={
+    post.data.updatedDate || post.data.publishDate
+  }
+  author={post.data.author}
+>
+  <Fragment slot="head">
+    <ArticleSchema
+      title={post.data.title}
+      description={post.data.description}
+      url={articleUrl}
+      image={articleImage}
+      publishedTime={post.data.publishDate}
+      modifiedTime={
+        post.data.updatedDate || post.data.publishDate
+      }
+      author={post.data.author}
+      siteName={settings.siteName}
+      logo={logoUrl}
+    />
+
+    <BreadcrumbSchema
+      items={[
+        {
+          name: "الرئيسية",
+          url: settings.siteUrl,
+        },
+        {
+          name: "المنشورات",
+          url: new URL(
+            "/blog/",
+            settings.siteUrl,
+          ).toString(),
+        },
+        {
+          name: post.data.title,
+          url: articleUrl,
+        },
+      ]}
+    />
+  </Fragment>
+
+  <main>
+    <Breadcrumbs
+      items={[
+        {
+          label: "الرئيسية",
+          href: "/",
+        },
+        {
+          label: "المنشورات",
+          href: "/blog/",
+        },
+        {
+          label: post.data.title,
+        },
+      ]}
+    />
+
+    <section class="section">
+      <article class="article container">
+        <header class="article__header">
+          <span class="article__category">
+            {post.data.category}
+          </span>
+
+          <h1>{post.data.title}</h1>
+
+          <p>{post.data.description}</p>
+
+          <div class="article__meta">
+            <time
+              datetime={post.data.publishDate.toISOString()}
+            >
+              {
+                post.data.publishDate.toLocaleDateString(
+                  "ar-SA",
+                  {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  },
+                )
+              }
+            </time>
+
+            <span>{post.data.author}</span>
+          </div>
+        </header>
+
+        {
+          post.data.image && (
+            <figure class="article__image">
+              <img
+                src={post.data.image}
+                alt={
+                  post.data.imageAlt ||
+                  post.data.title
+                }
+                width="1200"
+                height="675"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </figure>
+          )
+        }
+
+        <div class="article__content prose">
+          <Content />
+        </div>
+
+        <ShareButtons
+          title={post.data.title}
+          url={articleUrl}
+        />
+
+        <RelatedPosts posts={relatedPosts} />
+      </article>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+    .article__image {
+  overflow: hidden;
+  margin: 0 0 3rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-secondary);
+}
+
+.article__image img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+  .article {
+    max-width: 850px;
+  }
+
+  .article__header {
+    margin-bottom: 3rem;
+  }
+
+  .article__category {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .article h1 {
+    margin-block: 0.75rem 1rem;
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    line-height: 1.2;
+  }
+
+  .article__header p {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+  }
+
+  .article__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    color: var(--color-text-muted);
+  }
+
+  .article__content {
+    font-size: 1.075rem;
+  }
+
+  .article__content :global(h2) {
+    margin-block: 2.5rem 1rem;
+    font-size: 1.8rem;
+  }
+
+  .article__content :global(h3) {
+    margin-block: 2rem 0.75rem;
+  }
+
+  .article__content :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .article__content :global(ul),
+  .article__content :global(ol) {
+    padding-inline-start: 1.5rem;
+  }
+
+  .article__content :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+</style>

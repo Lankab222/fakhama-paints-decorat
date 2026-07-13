@@ -1,0 +1,578 @@
+local_backend: true
+
+backend:
+  name: git-gateway
+  branch: main
+
+locale: ar
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "blog"
+    label: "المنشورات"
+    label_singular: "منشور"
+    folder: "src/content/blog"
+    create: true
+    delete: true
+
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+
+    extension: "md"
+    format: "frontmatter"
+
+    editor:
+      preview: false
+
+    fields:
+      - label: "العنوان"
+        name: "title"
+        widget: "string"
+        required: true
+
+      - label: "الوصف"
+        name: "description"
+        widget: "text"
+        required: true
+        hint: "وصف مختصر مناسب لمحركات البحث."
+
+      - label: "تاريخ النشر"
+        name: "publishDate"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        required: true
+
+      - label: "تاريخ آخر تحديث"
+        name: "updatedDate"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        required: false
+
+      - label: "صورة المقال"
+        name: "image"
+        widget: "image"
+        required: false
+
+      - label: "النص البديل للصورة"
+        name: "imageAlt"
+        widget: "string"
+        required: false
+        hint: "صف الصورة باختصار لتحسين الوصول وSEO."
+
+      - label: "التصنيف"
+        name: "category"
+        widget: "string"
+        default: "عام"
+        required: true
+
+      - label: "الوسوم"
+        name: "tags"
+        widget: "list"
+        default: []
+        required: false
+
+      - label: "الكاتب"
+        name: "author"
+        widget: "string"
+        default: "محمد الرقابي"
+        required: true
+
+      - label: "مسودة"
+        name: "draft"
+        widget: "boolean"
+        default: false
+
+      - label: "منشور مميز"
+        name: "featured"
+        widget: "boolean"
+        default: false
+
+      - label: "محتوى المقال"
+        name: "body"
+        widget: "markdown"
+        required: true
+  - name: "services"
+    label: "الخدمات"
+    label_singular: "خدمة"
+    folder: "src/content/services"
+    create: true
+    delete: true
+
+    slug: "{{slug}}"
+
+    extension: "md"
+    format: "frontmatter"
+
+    editor:
+      preview: false
+
+    fields:
+      - label: "اسم الخدمة"
+        name: "title"
+        widget: "string"
+        required: true
+
+      - label: "الوصف الرئيسي"
+        name: "description"
+        widget: "text"
+        required: true
+
+      - label: "الوصف المختصر"
+        name: "shortDescription"
+        widget: "text"
+        required: false
+        hint: "يظهر في بطاقة الخدمة."
+
+      - label: "صورة الخدمة"
+        name: "image"
+        widget: "image"
+        required: false
+
+      - label: "النص البديل للصورة"
+        name: "imageAlt"
+        widget: "string"
+        required: false
+
+      - label: "الأيقونة"
+        name: "icon"
+        widget: "string"
+        required: false
+        hint: "اسم رمزي للأيقونة، مثل code أو paint."
+
+      - label: "ترتيب الظهور"
+        name: "order"
+        widget: "number"
+        default: 0
+        value_type: "int"
+
+      - label: "خدمة مميزة"
+        name: "featured"
+        widget: "boolean"
+        default: false
+
+      - label: "مسودة"
+        name: "draft"
+        widget: "boolean"
+        default: false
+
+      - label: "مميزات الخدمة"
+        name: "features"
+        widget: "list"
+        required: false
+        default: []
+
+      - label: "عنوان SEO"
+        name: "seoTitle"
+        widget: "string"
+        required: false
+        hint: "اتركه فارغًا لاستخدام اسم الخدمة."
+
+      - label: "وصف SEO"
+        name: "seoDescription"
+        widget: "text"
+        required: false
+        hint: "اتركه فارغًا لاستخدام الوصف الرئيسي."
+
+      - label: "تاريخ آخر تحديث"
+        name: "updatedDate"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        required: false
+
+      - label: "محتوى الخدمة"
+        name: "body"
+        widget: "markdown"
+        required: true
+  - name: "projects"
+    label: "المشاريع"
+    label_singular: "مشروع"
+    folder: "src/content/projects"
+    create: true
+    delete: true
+
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+
+    editor:
+      preview: false
+
+    fields:
+      - label: "اسم المشروع"
+        name: "title"
+        widget: "string"
+        required: true
+
+      - label: "وصف المشروع"
+        name: "description"
+        widget: "text"
+        required: true
+
+      - label: "التصنيف"
+        name: "category"
+        widget: "string"
+        default: "عام"
+
+      - label: "الموقع"
+        name: "location"
+        widget: "string"
+        required: false
+
+      - label: "تاريخ الإنجاز"
+        name: "completionDate"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        required: false
+
+      - label: "الصورة الرئيسية"
+        name: "coverImage"
+        widget: "image"
+        required: false
+
+      - label: "النص البديل للصورة الرئيسية"
+        name: "coverImageAlt"
+        widget: "string"
+        required: false
+
+      - label: "معرض الصور"
+        name: "gallery"
+        widget: "list"
+        required: false
+        fields:
+          - label: "الصورة"
+            name: "image"
+            widget: "image"
+
+          - label: "النص البديل"
+            name: "alt"
+            widget: "string"
+
+      - label: "الخدمات المقدمة"
+        name: "services"
+        widget: "list"
+        required: false
+
+      - label: "مشروع مميز"
+        name: "featured"
+        widget: "boolean"
+        default: false
+
+      - label: "مسودة"
+        name: "draft"
+        widget: "boolean"
+        default: false
+
+      - label: "ترتيب الظهور"
+        name: "order"
+        widget: "number"
+        default: 0
+        value_type: "int"
+
+      - label: "عنوان SEO"
+        name: "seoTitle"
+        widget: "string"
+        required: false
+
+      - label: "وصف SEO"
+        name: "seoDescription"
+        widget: "text"
+        required: false
+
+      - label: "محتوى المشروع"
+        name: "body"
+        widget: "markdown"
+        required: true
+  - name: "settings"
+    label: "إعدادات الموقع"
+    files:
+      - name: "site"
+        label: "الإعدادات العامة"
+        file: "src/content/settings/site.json"
+
+        fields:
+          - label: "اسم الموقع"
+            name: "siteName"
+            widget: "string"
+
+          - label: "عنوان الموقع"
+            name: "siteTitle"
+            widget: "string"
+
+          - label: "وصف الموقع"
+            name: "description"
+            widget: "text"
+
+          - label: "رابط الموقع"
+            name: "siteUrl"
+            widget: "string"
+            hint: "https://example.com"
+
+          - label: "صورة المشاركة الافتراضية"
+            name: "defaultImage"
+            widget: "image"
+            required: true
+            default: "/og-default.jpg"
+
+          - label: "الشعار"
+            name: "logo"
+            widget: "image"
+            required: false
+
+          - label: "رقم الهاتف"
+            name: "phone"
+            widget: "string"
+            required: false
+
+          - label: "رقم واتساب"
+            name: "whatsapp"
+            widget: "string"
+            required: false
+            hint: "اكتب الرقم بصيغة دولية بدون علامة +"
+
+          - label: "البريد الإلكتروني"
+            name: "email"
+            widget: "string"
+            required: false
+
+          - label: "العنوان"
+            name: "address"
+            widget: "string"
+            required: false
+
+          - label: "فيسبوك"
+            name: "facebook"
+            widget: "string"
+            required: false
+
+          - label: "إنستغرام"
+            name: "instagram"
+            widget: "string"
+            required: false
+
+          - label: "منصة X"
+            name: "x"
+            widget: "string"
+            required: false
+
+          - label: "يوتيوب"
+            name: "youtube"
+            widget: "string"
+            required: false
+
+          - label: "اللون الرئيسي"
+            name: "primaryColor"
+            widget: "color"
+            default: "#166534"
+
+          - label: "نص حقوق النشر"
+            name: "footerText"
+            widget: "string"
+            default: "جميع الحقوق محفوظة"
+            
+          - label: "شارة الهيرو"
+            name: "heroBadge"
+            widget: "string"
+            required: false
+            hint: "مثال: حلول رقمية احترافية"
+
+          - label: "عنوان الهيرو"
+            name: "heroTitle"
+            widget: "string"
+            required: true
+
+          - label: "وصف الهيرو"
+            name: "heroDescription"
+            widget: "text"
+            required: true
+
+          - label: "صورة الهيرو"
+            name: "heroImage"
+            widget: "image"
+            required: false
+
+          - label: "النص البديل لصورة الهيرو"
+            name: "heroImageAlt"
+            widget: "string"
+            required: false
+
+          - label: "نص الزر الرئيسي"
+            name: "heroPrimaryButtonText"
+            widget: "string"
+            default: "اطلب الخدمة"
+
+          - label: "رابط الزر الرئيسي"
+            name: "heroPrimaryButtonUrl"
+            widget: "string"
+            default: "/contact/"
+
+          - label: "نص الزر الثانوي"
+            name: "heroSecondaryButtonText"
+            widget: "string"
+            required: false
+
+          - label: "رابط الزر الثانوي"
+            name: "heroSecondaryButtonUrl"
+            widget: "string"
+            required: false
+          
+          - label: "شارة قسم من نحن"
+            name: "aboutBadge"
+            widget: "string"
+            required: false
+            default: "من نحن"
+
+          - label: "عنوان قسم من نحن"
+            name: "aboutTitle"
+            widget: "string"
+            required: true
+
+          - label: "وصف قسم من نحن"
+            name: "aboutDescription"
+            widget: "text"
+            required: true
+
+          - label: "صورة قسم من نحن"
+            name: "aboutImage"
+            widget: "image"
+            required: false
+
+          - label: "النص البديل لصورة من نحن"
+            name: "aboutImageAlt"
+            widget: "string"
+            required: false
+
+          - label: "نص زر من نحن"
+            name: "aboutButtonText"
+            widget: "string"
+            default: "تعرف علينا"
+
+          - label: "رابط زر من نحن"
+            name: "aboutButtonUrl"
+            widget: "string"
+            default: "/about/"
+
+          - label: "مميزات النشاط"
+            name: "aboutFeatures"
+            widget: "list"
+            required: false
+
+          - label: "عنوان دعوة التواصل"
+            name: "ctaTitle"
+            widget: "string"
+            required: true
+
+          - label: "وصف دعوة التواصل"
+            name: "ctaDescription"
+            widget: "text"
+            required: true
+
+          - label: "نص زر دعوة التواصل"
+            name: "ctaButtonText"
+            widget: "string"
+            default: "ابدأ مشروعك الآن"
+
+          - label: "رابط زر دعوة التواصل"
+            name: "ctaButtonUrl"
+            widget: "string"
+            default: "/contact/"
+  - name: "faq"
+    label: "الأسئلة الشائعة"
+    label_singular: "سؤال"
+    folder: "src/content/faq"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+
+    editor:
+      preview: false
+
+    fields:
+      - label: "السؤال"
+        name: "question"
+        widget: "string"
+
+      - label: "الإجابة"
+        name: "answer"
+        widget: "text"
+
+      - label: "التصنيف"
+        name: "category"
+        widget: "string"
+        default: "عام"
+
+      - label: "ترتيب الظهور"
+        name: "order"
+        widget: "number"
+        default: 0
+        value_type: "int"
+
+      - label: "منشور"
+        name: "published"
+        widget: "boolean"
+        default: true
+  - name: "testimonials"
+    label: "آراء العملاء"
+    label_singular: "رأي عميل"
+    folder: "src/content/testimonials"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+
+    editor:
+      preview: false
+
+    fields:
+      - label: "اسم العميل"
+        name: "name"
+        widget: "string"
+
+      - label: "الصفة"
+        name: "role"
+        widget: "string"
+        required: false
+
+      - label: "الشركة"
+        name: "company"
+        widget: "string"
+        required: false
+
+      - label: "التقييم"
+        name: "rating"
+        widget: "number"
+        default: 5
+        min: 1
+        max: 5
+        value_type: "int"
+
+      - label: "صورة العميل"
+        name: "image"
+        widget: "image"
+        required: false
+
+      - label: "رأي العميل"
+        name: "quote"
+        widget: "text"
+
+      - label: "ترتيب الظهور"
+        name: "order"
+        widget: "number"
+        default: 0
+        value_type: "int"
+
+      - label: "منشور"
+        name: "published"
+        widget: "boolean"
+        default: true

@@ -1,0 +1,72 @@
+---
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  items: FaqItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="section faq-section">
+  <div class="container">
+    <header class="section-header">
+      <span>الأسئلة الشائعة</span>
+      <h2>إجابات عن أكثر الأسئلة تكرارًا</h2>
+    </header>
+
+    <div class="faq-list">
+      {
+        items.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-header {
+    max-width: 720px;
+    margin-bottom: 2rem;
+  }
+
+  .section-header span {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .section-header h2 {
+    margin-block: 0.5rem 0;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+  }
+
+  .faq-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    font-weight: 800;
+  }
+
+  .faq-item p {
+    margin: 0;
+    padding: 0 1.25rem 1.25rem;
+    color: var(--color-text-muted);
+  }
+</style>

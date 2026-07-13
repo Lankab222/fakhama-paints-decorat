@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+
+    <title>إدارة المحتوى | Alraqabi Astro Starter</title>
+
+    <style>
+      /*
+       * نبقي هيكل لوحة Decap باتجاه LTR
+       * لأن الواجهة لا تدعم RTL بصورة كاملة.
+       */
+      html,
+      body,
+      #nc-root {
+        direction: ltr;
+      }
+
+      /*
+       * نجعل حقول النص والمحتوى عربية RTL.
+       */
+      input,
+      textarea,
+      [contenteditable="true"] {
+        direction: rtl;
+        text-align: right;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
+  </body>
+</html>

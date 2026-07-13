@@ -1,0 +1,148 @@
+---
+interface Testimonial {
+  name: string;
+  role?: string;
+  company?: string;
+  rating: number;
+  image?: string;
+  quote: string;
+}
+
+interface Props {
+  items: Testimonial[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="section testimonials-section">
+  <div class="container">
+    <header class="section-header">
+      <span>آراء العملاء</span>
+      <h2>ماذا يقول عملاؤنا؟</h2>
+    </header>
+
+    <div class="testimonials-grid">
+      {
+        items.map((item) => (
+          <article class="testimonial-card">
+            <div
+              class="rating"
+              aria-label={`التقييم ${item.rating} من 5`}
+            >
+              {"★".repeat(item.rating)}
+              <span aria-hidden="true">
+                {"☆".repeat(5 - item.rating)}
+              </span>
+            </div>
+
+            <blockquote>{item.quote}</blockquote>
+
+            <footer>
+              {item.image && (
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  width="52"
+                  height="52"
+                  loading="lazy"
+                />
+              )}
+
+              <div>
+                <strong>{item.name}</strong>
+
+                {(item.role || item.company) && (
+                  <span>
+                    {[item.role, item.company]
+                      .filter(Boolean)
+                      .join(" - ")}
+                  </span>
+                )}
+              </div>
+            </footer>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonials-section {
+    background: var(--color-surface);
+  }
+
+  .section-header {
+    max-width: 720px;
+    margin-bottom: 2rem;
+  }
+
+  .section-header span {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .section-header h2 {
+    margin-block: 0.5rem 0;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+  }
+
+  .testimonials-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .testimonial-card {
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-background);
+  }
+
+  .rating {
+    margin-bottom: 1rem;
+    color: #b7791f;
+    letter-spacing: 0.1em;
+  }
+
+  blockquote {
+    margin: 0 0 1.5rem;
+    color: var(--color-text);
+    font-size: 1.05rem;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  footer img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  footer div {
+    display: grid;
+  }
+
+  footer span {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  @media (min-width: 768px) {
+    .testimonials-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .testimonials-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,176 @@
+---
+interface ProjectItem {
+  id: string;
+
+  data: {
+    title: string;
+    description: string;
+    category: string;
+    coverImage?: string;
+    coverImageAlt?: string;
+    location?: string;
+  };
+}
+
+interface Props {
+  projects: ProjectItem[];
+}
+
+const { projects } = Astro.props;
+---
+
+{
+  projects.length > 0 && (
+    <section class="related-projects">
+      <header class="related-projects__header">
+        <span>مشاريع أخرى</span>
+        <h2>قد تهمك هذه المشاريع</h2>
+      </header>
+
+      <div class="related-projects__grid">
+        {projects.map((project) => (
+          <article class="project-card">
+            <a
+              class="project-card__link"
+              href={`/projects/${project.id}/`}
+              aria-label={`عرض مشروع ${project.data.title}`}
+            >
+              {project.data.coverImage && (
+                <img
+                  src={project.data.coverImage}
+                  alt={
+                    project.data.coverImageAlt ||
+                    project.data.title
+                  }
+                  width="800"
+                  height="600"
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
+
+              <div class="project-card__overlay"></div>
+
+              <div class="project-card__content">
+                <span>{project.data.category}</span>
+
+                <h3>{project.data.title}</h3>
+
+                <p>{project.data.description}</p>
+
+                {project.data.location && (
+                  <small>{project.data.location}</small>
+                )}
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .related-projects {
+    margin-top: 4rem;
+  }
+
+  .related-projects__header {
+    margin-bottom: 1.5rem;
+  }
+
+  .related-projects__header > span {
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  .related-projects h2 {
+    margin-block: 0.5rem 0;
+    font-size: clamp(1.7rem, 4vw, 2.5rem);
+  }
+
+  .related-projects__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .project-card {
+    position: relative;
+    min-height: 320px;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--color-text);
+  }
+
+  .project-card__link {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  .project-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms ease;
+  }
+
+  .project-card:hover img {
+    transform: scale(1.04);
+  }
+
+  .project-card__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to top,
+        rgb(0 0 0 / 80%),
+        rgb(0 0 0 / 10%) 70%
+      );
+  }
+
+  .project-card__content {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1.25rem;
+    color: white;
+  }
+
+  .project-card__content > span {
+    display: inline-flex;
+    margin-bottom: 0.6rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 16%);
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .project-card h3 {
+    margin-bottom: 0.45rem;
+    font-size: 1.3rem;
+  }
+
+  .project-card p {
+    display: -webkit-box;
+    margin-bottom: 0.4rem;
+    overflow: hidden;
+    color: rgb(255 255 255 / 82%);
+    font-size: 0.92rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .project-card small {
+    color: rgb(255 255 255 / 72%);
+  }
+
+  @media (min-width: 760px) {
+    .related-projects__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

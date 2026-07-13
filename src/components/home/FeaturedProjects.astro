@@ -1,0 +1,229 @@
+---
+interface ProjectItem {
+  id: string;
+
+  data: {
+    title: string;
+    description: string;
+    category: string;
+    location?: string;
+    coverImage?: string;
+    coverImageAlt?: string;
+  };
+}
+
+interface Props {
+  projects: ProjectItem[];
+}
+
+const { projects } = Astro.props;
+---
+
+{
+  projects.length > 0 && (
+    <section class="section featured-projects">
+      <div class="container">
+        <header class="section-header">
+          <div>
+            {/* <span class="eyebrow">أعمالنا</span> */}
+            <h2>مشاريع مختارة نفخر بتنفيذها</h2>
+            <p>
+              نماذج من المشاريع التي توضح مستوى التصميم وجودة التنفيذ.
+            </p>
+          </div>
+
+          <a class="view-all" href="/projects/">
+            جميع المشاريع
+            <span aria-hidden="true">←</span>
+          </a>
+        </header>
+
+        <div class="projects-grid">
+          {projects.map((project, index) => (
+            <article
+              class:list={[
+                "project-card",
+                index === 0 && "project-card--large",
+              ]}
+            >
+              <a
+                class="project-card__link"
+                href={`/projects/${project.id}/`}
+                aria-label={`عرض مشروع ${project.data.title}`}
+              >
+                {project.data.coverImage && (
+                  <img
+                    src={project.data.coverImage}
+                    alt={
+                      project.data.coverImageAlt ||
+                      project.data.title
+                    }
+                    width="1000"
+                    height="760"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
+
+                <div class="project-card__overlay"></div>
+
+                <div class="project-card__content">
+                  <span>{project.data.category}</span>
+
+                  <h3>{project.data.title}</h3>
+
+                  <p>{project.data.description}</p>
+
+                  {project.data.location && (
+                    <small>{project.data.location}</small>
+                  )}
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .featured-projects {
+    background: var(--color-background);
+  }
+
+  .section-header {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 2.25rem;
+    text-align: center;
+  }
+
+  .section-header > div {
+    max-width: 760px;
+  }
+
+  .eyebrow {
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  .section-header h2 {
+    margin-block: 0.55rem 0.75rem;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.25;
+  }
+
+  .section-header p {
+    color: var(--color-text-muted);
+  }
+
+  .view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: end;
+    justify-self: start;
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  .projects-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .project-card {
+    position: relative;
+    min-height: 360px;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--color-text);
+  }
+
+  .project-card__link {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  .project-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 450ms ease;
+  }
+
+  .project-card:hover img {
+    transform: scale(1.045);
+  }
+
+  .project-card__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to top,
+        rgb(0 0 0 / 78%),
+        rgb(0 0 0 / 10%) 65%
+      );
+  }
+
+  .project-card__content {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1.5rem;
+    color: white;
+  }
+
+  .project-card__content > span {
+    display: inline-flex;
+    margin-bottom: 0.65rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 16%);
+    font-size: 0.82rem;
+    font-weight: 800;
+    backdrop-filter: blur(8px);
+  }
+
+  .project-card h3 {
+    margin-bottom: 0.55rem;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+  }
+
+  .project-card p {
+    display: -webkit-box;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    color: rgb(255 255 255 / 82%);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .project-card small {
+    color: rgb(255 255 255 / 72%);
+  }
+
+  @media (min-width: 768px) {
+    .section-header {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+
+    .view-all {
+      justify-self: end;
+    }
+
+    .projects-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .project-card--large {
+      grid-row: span 2;
+      min-height: 736px;
+    }
+  }
+</style>

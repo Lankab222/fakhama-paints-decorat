@@ -1,0 +1,111 @@
+---
+interface Props {
+  title: string;
+  url: string;
+}
+
+const { title, url } = Astro.props;
+
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(url);
+
+const links = [
+  {
+    label: "واتساب",
+    href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
+  },
+  {
+    label: "فيسبوك",
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+  },
+  {
+    label: "منصة X",
+    href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+  },
+  {
+    label: "لينكدإن",
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+  },
+];
+---
+
+<div class="share-box">
+  <strong>شارك المقال</strong>
+
+  <div class="share-links">
+    {
+      links.map((item) => (
+        <a
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {item.label}
+        </a>
+      ))
+    }
+
+    <button type="button" data-copy-url={url}>
+      نسخ الرابط
+    </button>
+  </div>
+</div>
+
+<script>
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-copy-url]")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const url = button.dataset.copyUrl;
+
+        if (!url) return;
+
+        try {
+          await navigator.clipboard.writeText(url);
+          button.textContent = "تم النسخ";
+        } catch {
+          button.textContent = "تعذر النسخ";
+        }
+
+        window.setTimeout(() => {
+          button.textContent = "نسخ الرابط";
+        }, 1800);
+      });
+    });
+</script>
+
+<style>
+  .share-box {
+    display: grid;
+    gap: 1rem;
+    margin-block: 2.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .share-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .share-links a,
+  .share-links button {
+    min-height: 42px;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    color: var(--color-text);
+    font: inherit;
+    font-weight: 700;
+  }
+
+  .share-links a:hover,
+  .share-links button:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+</style>

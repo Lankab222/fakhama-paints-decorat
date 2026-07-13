@@ -1,0 +1,141 @@
+---
+import "../styles/global.css";
+
+import { getEntry } from "astro:content";
+
+import Header from "../components/common/Header.astro";
+import Footer from "../components/common/Footer.astro";
+import FloatingSocials from "../components/common/FloatingSocials.astro";
+import SEO from "../components/seo/SEO.astro";
+import SiteSchema from "../components/schema/SiteSchema.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+
+  image?: string;
+
+  type?: "website" | "article";
+
+  noindex?: boolean;
+
+  publishedTime?: Date | string;
+  modifiedTime?: Date | string;
+
+  author?: string;
+
+  pageType?: "WebPage" | "AboutPage" | "ContactPage";
+}
+
+const settingsEntry = await getEntry("settings", "site");
+
+if (!settingsEntry) {
+  throw new Error("ملف إعدادات الموقع غير موجود");
+}
+
+const settings = settingsEntry.data;
+
+const {
+  title = settings.siteTitle,
+  description = settings.description,
+
+  image = settings.defaultImage,
+
+  type = "website",
+  noindex = false,
+
+  publishedTime,
+  modifiedTime,
+  author,
+
+  pageType = "WebPage",
+} = Astro.props;
+
+const fullTitle =
+  title === settings.siteTitle ? title : `${title} | ${settings.siteName}`;
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl" style={`--color-primary: ${settings.primaryColor};`}>
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <SEO
+      title={fullTitle}
+      description={description}
+      image={image}
+      type={type}
+      noindex={noindex}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      author={author}
+    />
+
+    <meta name="theme-color" content={settings.primaryColor} />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={settings.logo || "/favicon.svg"}
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`منشورات ${settings.siteName}`}
+      href={new URL("/rss.xml", settings.siteUrl).toString()}
+    />
+
+    <SiteSchema
+      siteName={settings.siteName}
+      siteUrl={settings.siteUrl}
+      title={fullTitle}
+      description={description}
+      logo={settings.logo}
+      image={image}
+      phone={settings.phone}
+      email={settings.email}
+      address={settings.address}
+      pageType={pageType}
+    />
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main-content">
+  الانتقال إلى المحتوى
+</a>
+  <Header
+    siteName={settings.siteName}
+    logo={settings.logo}
+  />
+
+  <slot />
+
+  <Footer
+  siteName={settings.siteName}
+  footerText={settings.footerText}
+  description={settings.description}
+  logo={settings.logo}
+  phone={settings.phone}
+  whatsapp={settings.whatsapp}
+  email={settings.email}
+  address={settings.address}
+  facebook={settings.facebook}
+  instagram={settings.instagram}
+  x={settings.x}
+  youtube={settings.youtube}
+/>
+
+  <FloatingSocials
+    phone={settings.phone}
+    whatsapp={settings.whatsapp}
+    email={settings.email}
+    facebook={settings.facebook}
+    instagram={settings.instagram}
+    x={settings.x}
+  />
+</body>
+</html>

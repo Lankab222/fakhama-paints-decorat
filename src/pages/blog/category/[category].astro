@@ -1,0 +1,152 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageHero from "../../../components/common/PageHero.astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+  const categories = [...new Set(posts.map((post) => post.data.category))];
+
+  return categories.map((category) => ({
+    params: {
+      category,
+    },
+
+    props: {
+      category,
+      posts: posts.filter((post) => post.data.category === category),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category, posts } = Astro.props;
+---
+
+<BaseLayout
+  title={`تصنيف ${category}`}
+  description={`المنشورات التابعة لتصنيف ${category}.`}
+>
+  <main>
+    <PageHero
+      eyebrow="تصنيف المنشورات"
+      title={category}
+      description={`جميع المقالات والمنشورات التابعة لتصنيف ${category}.`}
+    />
+
+    <section class="section">
+      <div class="container">
+        {
+          posts.length > 0 ? (
+            <div class="posts-grid">
+              {posts.map((post) => (
+                <article class="post-card">
+                  {post.data.image && (
+                    <a class="post-card__media" href={`/blog/${post.id}/`}>
+                      <img
+                        src={post.data.image}
+                        alt={post.data.imageAlt || post.data.title}
+                        width="800"
+                        height="500"
+                        loading="lazy"
+                      />
+                    </a>
+                  )}
+
+                  <div class="post-card__content">
+                    <a
+                      class="post-category"
+                      href={`/blog/category/${encodeURIComponent(
+                        post.data.category,
+                      )}/`}
+                    >
+                      {post.data.category}
+                    </a>
+
+                    <h2>
+                      <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+                    </h2>
+
+                    <p>{post.data.description}</p>
+
+                    <a href={`/blog/${post.id}/`}>قراءة المقال</a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>لا توجد منشورات في هذا التصنيف.</p>
+          )
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .post-category {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+  .posts-grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .post-card {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .post-card__media {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+  }
+
+  .post-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post-card__content {
+    padding: 1.25rem;
+  }
+
+  .post-card__content > span {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+
+  .post-card h2 {
+    margin-block: 0.6rem;
+  }
+
+  .post-card p {
+    color: var(--color-text-muted);
+  }
+
+  .post-card__content > a:last-child {
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,324 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getEntry } from "astro:content";
+import ServiceSchema from "../../components/schema/ServiceSchema.astro";
+import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
+import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
+import RelatedServices from "../../components/services/RelatedServices.astro";
+
+export const getStaticPaths = (async () => {
+  const services = await getCollection("services", ({ data }) => !data.draft);
+
+  return services.map((service) => ({
+    params: {
+      id: service.id,
+    },
+
+    props: {
+      service,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { service } = Astro.props;
+const { Content } = await render(service);
+
+const relatedServices = (await getCollection("services"))
+  .filter((item) => !item.data.draft && item.id !== service.id)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+const settingsEntry = await getEntry("settings", "site");
+
+if (!settingsEntry) {
+  throw new Error("ملف إعدادات الموقع غير موجود");
+}
+
+const settings = settingsEntry.data;
+
+const serviceUrl = new URL(
+  `/services/${service.id}/`,
+  settings.siteUrl,
+).toString();
+
+const serviceImage = service.data.image
+  ? new URL(service.data.image, settings.siteUrl).toString()
+  : undefined;
+const pageTitle = service.data.seoTitle || service.data.title;
+
+const pageDescription = service.data.seoDescription || service.data.description;
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  image={service.data.image}
+>
+  <Fragment slot="head">
+    <ServiceSchema
+      name={service.data.title}
+      description={pageDescription}
+      url={serviceUrl}
+      image={serviceImage}
+      providerName={settings.siteName}
+      providerUrl={settings.siteUrl}
+      areaServed={settings.address}
+    />
+
+    <BreadcrumbSchema
+      items={[
+        {
+          name: "الرئيسية",
+          url: settings.siteUrl,
+        },
+        {
+          name: "الخدمات",
+          url: new URL("/services/", settings.siteUrl).toString(),
+        },
+        {
+          name: service.data.title,
+          url: serviceUrl,
+        },
+      ]}
+    />
+  </Fragment>
+  <main>
+    <Breadcrumbs
+      items={[
+        {
+          label: "الرئيسية",
+          href: "/",
+        },
+        {
+          label: "الخدمات",
+          href: "/services/",
+        },
+        {
+          label: service.data.title,
+        },
+      ]}
+    />
+    <article class="service">
+      <header class="service__header section">
+        <div class="container">
+          <span>خدماتنا</span>
+
+          <h1>{service.data.title}</h1>
+
+          <p>{service.data.description}</p>
+        </div>
+      </header>
+
+      {
+        service.data.image && (
+          <div class="container">
+            <figure class="service__image">
+              <img
+                src={service.data.image}
+                alt={service.data.imageAlt || service.data.title}
+                width="1200"
+                height="675"
+                loading="eager"
+                decoding="async"
+              />
+            </figure>
+          </div>
+        )
+      }
+
+      <div class="container service__layout section">
+        <div class="service__content prose">
+          <Content />
+        </div>
+
+        {
+          service.data.features.length > 0 && (
+            <aside class="service__features">
+              <h2>مميزات الخدمة</h2>
+
+              <ul>
+                {service.data.features.map((feature) => (
+                  <li>{feature}</li>
+                ))}
+              </ul>
+
+              <a class="cta-button" href="/contact/">
+                اطلب الخدمة
+              </a>
+            </aside>
+          )
+        }
+      </div>
+      
+      <RelatedServices services={relatedServices} />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .service-cta {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 3rem;
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 75%, black)
+    );
+  color: white;
+}
+
+.service-cta span {
+  font-weight: 800;
+  opacity: 0.8;
+}
+
+.service-cta h2 {
+  margin-block: 0.4rem 0.65rem;
+}
+
+.service-cta p {
+  margin: 0;
+  color: rgb(255 255 255 / 82%);
+}
+
+.service-cta a {
+  display: inline-flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  padding-inline: 1.25rem;
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+@media (min-width: 760px) {
+  .service-cta {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+  .service__header {
+    text-align: center;
+    background:
+      radial-gradient(
+        circle at top right,
+        rgb(22 101 52 / 12%),
+        transparent 40%
+      ),
+      var(--color-background);
+  }
+
+  .service__header .container {
+    max-width: 850px;
+  }
+
+  .service__header span {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .service__header h1 {
+    margin-block: 0.75rem 1rem;
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    line-height: 1.2;
+  }
+
+  .service__header p {
+    color: var(--color-text-muted);
+    font-size: 1.15rem;
+  }
+
+  .service__image {
+    overflow: hidden;
+    margin: 0;
+    border-radius: var(--radius-lg);
+    background: var(--color-secondary);
+    box-shadow: var(--shadow-md);
+  }
+
+  .service__image img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .service__layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .service__content {
+    min-width: 0;
+    font-size: 1.075rem;
+  }
+
+  .service__content :global(h2) {
+    margin-block: 2.5rem 1rem;
+    font-size: 1.8rem;
+  }
+
+  .service__content :global(h3) {
+    margin-block: 2rem 0.75rem;
+  }
+
+  .service__content :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .service__content :global(ul),
+  .service__content :global(ol) {
+    padding-inline-start: 1.5rem;
+  }
+
+  .service__features {
+    align-self: start;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .service__features h2 {
+    font-size: 1.35rem;
+  }
+
+  .service__features ul {
+    padding-inline-start: 1.25rem;
+  }
+
+  .service__features li {
+    margin-bottom: 0.65rem;
+  }
+
+  .cta-button {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding-inline: 1.25rem;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: white;
+    font-weight: 700;
+  }
+
+  @media (min-width: 900px) {
+    .service__layout {
+      grid-template-columns: minmax(0, 1fr) 320px;
+    }
+
+    .service__features {
+      position: sticky;
+      top: 1.5rem;
+    }
+  }
+</style>

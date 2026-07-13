@@ -1,0 +1,249 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/common/PageHero.astro";
+import BlogFilters from "../../components/blog/BlogFilters.astro";
+
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+
+const categories = [...new Set(posts.map((post) => post.data.category))].sort(
+  (a, b) => a.localeCompare(b, "ar"),
+);
+---
+
+<BaseLayout
+  title="المنشورات"
+  description="أحدث المقالات والمنشورات والصور حول اعمال الدهانات والديكورا التي نقدمها"
+>
+  <PageHero
+    eyebrow="المدونة"
+    title="أحدث المقالات والمنشورات"
+    description="أحدث المقالات والمنشورات والصور حول اعمال الدهانات والديكورا التي نقدمها"
+  />
+  <main class="section blog-list">
+    <div class="container">
+      <BlogFilters categories={categories} />
+      {
+        posts.length > 0 ? (
+          <div class="posts-grid">
+            {posts.map((post) => (
+              <article
+                class="post-card"
+                data-blog-post
+                data-category={post.data.category}
+                data-search-text={[
+                  post.data.title,
+                  post.data.description,
+                  post.data.category,
+                  post.data.author,
+                  ...post.data.tags,
+                ].join(" ")}
+              >
+                {post.data.image && (
+                  <a href={`/blog/${post.id}/`} class="post-card__image-link">
+                    <img
+                      class="post-card__image"
+                      src={post.data.image}
+                      alt={post.data.imageAlt || post.data.title}
+                      width="800"
+                      height="500"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </a>
+                )}
+                <div class="post-card__content">
+                  <span class="post-card__category">{post.data.category}</span>
+
+                  <h2>
+                    <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+                  </h2>
+
+                  <p>{post.data.description}</p>
+
+                  <div class="post-card__meta">
+                    <time datetime={post.data.publishDate.toISOString()}>
+                      {post.data.publishDate.toLocaleDateString("ar-SA", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </time>
+
+                    <span>{post.data.author}</span>
+                  </div>
+
+                  <a class="post-card__link" href={`/blog/${post.id}/`}>
+                    قراءة المقال
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p>لا توجد منشورات منشورة حاليًا.</p>
+        )
+      }
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .post-card[hidden] {
+  display: none;
+}
+
+.post-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-block: 1rem;
+}
+
+.post-card__tags a {
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background:
+    color-mix(
+      in srgb,
+      var(--color-primary) 9%,
+      transparent
+    );
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+  .blog-list {
+    padding-top: 3rem;
+  }
+  @media (max-width: 640px) {
+    .post-card__content {
+      padding: 1.1rem;
+    }
+
+    .post-card h2,
+    .post-card h3 {
+      font-size: 1.2rem;
+      line-height: 1.55;
+    }
+  }
+  @media (max-width: 640px) {
+    .blog-list {
+      padding-top: 2rem;
+    }
+  }
+  .post-card {
+    transition:
+      transform var(--transition),
+      box-shadow var(--transition),
+      border-color var(--transition);
+  }
+
+  .service-card:hover,
+  .project-card:hover,
+  .post-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(
+      in srgb,
+      var(--color-primary) 28%,
+      var(--color-border)
+    );
+    box-shadow: var(--shadow-md);
+  }
+  .posts-grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .post-card {
+    min-width: 0;
+  }
+
+  .post-card__content {
+    padding: 1.25rem;
+  }
+
+  .post-card h2,
+  .post-card h3 {
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  .post-card__image,
+  .post-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .post-card {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .post-card__content {
+    padding: 1.5rem;
+  }
+
+  .post-card__category {
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .post-card h2 {
+    margin-block: 0.75rem;
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
+
+  .post-card p {
+    color: var(--color-text-muted);
+  }
+
+  .post-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-block: 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .post-card__link {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .post-card__image-link {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: var(--color-secondary);
+  }
+
+  .post-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition);
+  }
+
+  .post-card:hover .post-card__image {
+    transform: scale(1.03);
+  }
+</style>

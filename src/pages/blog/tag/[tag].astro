@@ -1,0 +1,128 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageHero from "../../../components/common/PageHero.astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection(
+    "blog",
+    ({ data }) => !data.draft,
+  );
+
+  const tags = [
+    ...new Set(
+      posts.flatMap(
+        (post) => post.data.tags,
+      ),
+    ),
+  ];
+
+  return tags.map((tag) => ({
+    params: {
+      tag,
+    },
+
+    props: {
+      tag,
+      posts: posts.filter((post) =>
+        post.data.tags.includes(tag),
+      ),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const {
+  tag,
+  posts,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={`وسم ${tag}`}
+  description={`المنشورات المرتبطة بوسم ${tag}.`}
+>
+  <main>
+    <PageHero
+      eyebrow="وسم"
+      title={`#${tag}`}
+      description={`جميع المنشورات المرتبطة بوسم ${tag}.`}
+    />
+
+    <section class="section">
+      <div class="container">
+        {
+          posts.length > 0 ? (
+            <div class="posts-list">
+              {posts.map((post) => (
+                <article class="post-row">
+                  <div>
+                    <span>{post.data.category}</span>
+
+                    <h2>
+                      <a href={`/blog/${post.id}/`}>
+                        {post.data.title}
+                      </a>
+                    </h2>
+
+                    <p>{post.data.description}</p>
+                  </div>
+
+                  <a href={`/blog/${post.id}/`}>
+                    قراءة المقال
+                  </a>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>لا توجد منشورات مرتبطة بهذا الوسم.</p>
+          )
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .posts-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .post-row {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .post-row span {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+
+  .post-row h2 {
+    margin-block: 0.5rem;
+  }
+
+  .post-row p {
+    color: var(--color-text-muted);
+  }
+
+  .post-row > a {
+    align-self: center;
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  @media (min-width: 760px) {
+    .post-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+  }
+</style>

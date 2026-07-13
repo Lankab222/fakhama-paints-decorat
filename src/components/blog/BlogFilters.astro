@@ -1,0 +1,215 @@
+---
+interface Props {
+  categories: string[];
+}
+
+const { categories } = Astro.props;
+---
+
+<section class="blog-filters" aria-label="البحث وتصفية المنشورات">
+  <div class="blog-filters__search">
+    <label for="blog-search">ابحث في المنشورات</label>
+
+    <input
+      id="blog-search"
+      type="search"
+      placeholder="اكتب عنوانًا أو كلمة..."
+      autocomplete="off"
+      data-blog-search
+    />
+  </div>
+
+  {
+    categories.length > 0 && (
+      <div class="blog-filters__categories">
+        <button
+          type="button"
+          class="active"
+          data-category-filter="all"
+        >
+          الكل
+        </button>
+
+        {categories.map((category) => (
+          <button
+            type="button"
+            data-category-filter={category}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  <p class="blog-filters__status" data-filter-status></p>
+</section>
+
+<script>
+  const searchInput =
+    document.querySelector<HTMLInputElement>(
+      "[data-blog-search]",
+    );
+
+  const categoryButtons =
+    document.querySelectorAll<HTMLButtonElement>(
+      "[data-category-filter]",
+    );
+
+  const posts =
+    document.querySelectorAll<HTMLElement>(
+      "[data-blog-post]",
+    );
+
+  const status =
+    document.querySelector<HTMLElement>(
+      "[data-filter-status]",
+    );
+
+  let activeCategory = "all";
+
+  const normalize = (value: string) =>
+    value
+      .toLocaleLowerCase("ar")
+      .trim();
+
+  const filterPosts = () => {
+    const query = normalize(
+      searchInput?.value || "",
+    );
+
+    let visibleCount = 0;
+
+    posts.forEach((post) => {
+      const searchableText = normalize(
+        post.dataset.searchText || "",
+      );
+
+      const category =
+        post.dataset.category || "";
+
+      const matchesSearch =
+        !query ||
+        searchableText.includes(query);
+
+      const matchesCategory =
+        activeCategory === "all" ||
+        category === activeCategory;
+
+      const visible =
+        matchesSearch &&
+        matchesCategory;
+
+      post.hidden = !visible;
+
+      if (visible) {
+        visibleCount += 1;
+      }
+    });
+
+    if (status) {
+      status.textContent =
+        visibleCount > 0
+          ? `عدد النتائج: ${visibleCount}`
+          : "لا توجد منشورات مطابقة.";
+    }
+  };
+
+  searchInput?.addEventListener(
+    "input",
+    filterPosts,
+  );
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activeCategory =
+        button.dataset.categoryFilter ||
+        "all";
+
+      categoryButtons.forEach((item) => {
+        item.classList.toggle(
+          "active",
+          item === button,
+        );
+      });
+
+      filterPosts();
+    });
+  });
+
+  filterPosts();
+</script>
+
+<style>
+  .blog-filters {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .blog-filters__search {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .blog-filters__search label {
+    font-weight: 800;
+  }
+
+  .blog-filters__search input {
+    width: 100%;
+    min-height: 50px;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    color: var(--color-text);
+    outline: none;
+  }
+
+  .blog-filters__search input:focus {
+    border-color: var(--color-primary);
+    box-shadow:
+      0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--color-primary) 15%,
+        transparent
+      );
+  }
+
+  .blog-filters__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .blog-filters__categories button {
+    min-height: 40px;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-background);
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .blog-filters__categories button.active,
+  .blog-filters__categories button:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .blog-filters__status {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+</style>

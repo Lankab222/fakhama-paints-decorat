@@ -1,0 +1,343 @@
+---
+interface Props {
+  badge?: string;
+
+  title: string;
+  description: string;
+
+  image?: string;
+  imageAlt?: string;
+
+  primaryButtonText: string;
+  primaryButtonUrl: string;
+
+  secondaryButtonText?: string;
+  secondaryButtonUrl?: string;
+}
+
+const {
+  badge,
+  title,
+  description,
+  image,
+  imageAlt,
+
+  primaryButtonText,
+  primaryButtonUrl,
+
+  secondaryButtonText,
+  secondaryButtonUrl,
+} = Astro.props;
+---
+
+<section class="hero">
+  <div class="container hero__grid">
+    <div class="hero__content">
+      {
+        badge && (
+          <span class="hero__badge">
+            <span aria-hidden="true"></span>
+            {badge}
+          </span>
+        )
+      }
+
+      <h1>{title}</h1>
+
+      <p class="hero__description">
+        {description}
+      </p>
+
+      <div class="hero__actions ">
+        <a
+          class="button button--primary"
+          href={primaryButtonUrl}
+        >
+          {primaryButtonText}
+
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+          >
+            <path
+              d="M5 12h14M13 6l6 6-6 6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+
+        {
+          secondaryButtonText && secondaryButtonUrl && (
+            <a
+              class="button button--secondary"
+              href={secondaryButtonUrl}
+            >
+              {secondaryButtonText}
+            </a>
+          )
+        }
+      </div>
+
+      
+    </div>
+
+    {
+      image && (
+        <div class="hero__visual">
+          <div class="hero__image-wrapper">
+            <img
+              src={image}
+              alt={imageAlt || title}
+              width="800"
+              height="800"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+
+            <div class="hero__floating-card">
+              <strong> دهانات وديكورات الفخامة</strong>
+              <span>لدينا افضل معلمين الدهانات والديكورات والترميمات والعوازل والمظلات والسواتر </span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero {
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding-block: 4rem;
+    background:
+      radial-gradient(
+        circle at 90% 10%,
+        color-mix(in srgb, var(--color-primary) 15%, transparent),
+        transparent 35%
+      ),
+      linear-gradient(
+        180deg,
+        var(--color-background),
+        var(--color-surface)
+      );
+  }
+
+  .hero::before {
+    position: absolute;
+    inset: auto auto 10% -8rem;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 50%;
+    background: color-mix(
+      in srgb,
+      var(--color-primary) 8%,
+      transparent
+    );
+    content: "";
+    filter: blur(10px);
+  }
+
+  .hero__grid {
+    position: relative;
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .hero__content {
+    max-width: 760px;
+    
+  }
+
+  .hero__badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-bottom: 1.25rem;
+    margin-left: 4rem;
+    margin-right: 4rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-background);
+    color: var(--color-primary);
+    font-size: 0.92rem;
+    font-weight: 800;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .hero__badge span {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    box-shadow:
+      0 0 0 5px
+      color-mix(in srgb, var(--color-primary) 15%, transparent);
+  }
+
+  .hero h1 {
+    max-width: 900px;
+    margin-bottom: 1.25rem;
+    font-size: clamp(2.45rem, 8vw, 5rem);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+  }
+
+  .hero__description {
+    max-width: 680px;
+    margin-bottom: 0;
+    color: var(--color-text-muted);
+    font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+  }
+
+  .hero__actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .button {
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding-inline: 1.35rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-weight: 800;
+    transition:
+      transform var(--transition),
+      box-shadow var(--transition),
+      background-color var(--transition);
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+  }
+
+  .button--primary {
+    background: var(--color-primary);
+    color: white;
+    box-shadow:
+      0 12px 28px
+      color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  .button--secondary {
+    color: #ffffff;
+    border-color:  rgb(255, 255, 255);
+    background: rgb(0, 46, 173);
+  }
+
+  .hero__trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    color: var(--color-text-muted);
+    list-style: none;
+    font-size: 0.92rem;
+  }
+
+  .hero__trust li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .hero__trust span {
+    display: inline-grid;
+    width: 1.35rem;
+    height: 1.35rem;
+    place-items: center;
+    border-radius: 50%;
+    background:
+      color-mix(in srgb, var(--color-primary) 12%, transparent);
+    color: var(--color-primary);
+    font-size: 0.8rem;
+    font-weight: 900;
+  }
+
+  .hero__visual {
+    position: relative;
+  }
+
+  .hero__image-wrapper {
+    position: relative;
+    overflow: hidden;
+    max-width: 620px;
+    margin-inline: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 2rem;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+
+  .hero__image-wrapper::after {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to top,
+        rgb(0 0 0 / 14%),
+        transparent 40%
+      );
+    content: "";
+    pointer-events: none;
+  }
+
+  .hero__image-wrapper img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  .hero__floating-card {
+    position: absolute;
+    z-index: 2;
+    right: 1rem;
+    bottom: 1rem;
+    display: grid;
+    gap: 0.15rem;
+    max-width: 92%;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(63, 25, 0, 0.45);
+    border-radius: var(--radius-md);
+    background: rgba(255, 239, 99, 0.9);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(12px);
+  }
+
+  .hero__floating-card span {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+  }
+
+  @media (min-width: 900px) {
+    .hero {
+      min-height: calc(100svh - 72px);
+      display: grid;
+      align-items: center;
+      padding-block: 5rem;
+    }
+
+    .hero__grid {
+      grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
+      gap: clamp(3rem, 6vw, 6rem);
+    }
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+import JsonLd from "./JsonLd.astro";
+
+interface Props {
+  siteName: string;
+  siteUrl: string;
+  title: string;
+  description: string;
+
+  logo?: string;
+  image?: string;
+
+  phone?: string;
+  email?: string;
+  address?: string;
+
+  pageType?: "WebPage" | "AboutPage" | "ContactPage";
+}
+
+const {
+  siteName,
+  siteUrl,
+  title,
+  description,
+  logo = "/favicon.svg",
+  image = "/og-default.jpg",
+  phone,
+  email,
+  address,
+  pageType = "WebPage",
+} = Astro.props;
+
+const baseUrl = siteUrl.replace(/\/$/, "");
+
+const currentPageUrl = new URL(
+  Astro.url.pathname,
+  `${baseUrl}/`,
+).toString();
+
+const organizationId = `${baseUrl}/#organization`;
+const websiteId = `${baseUrl}/#website`;
+const webpageId = `${currentPageUrl}#webpage`;
+
+const schema = {
+  "@context": "https://schema.org",
+
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": organizationId,
+
+      name: siteName,
+      url: `${baseUrl}/`,
+
+      logo: {
+        "@type": "ImageObject",
+        "@id": `${baseUrl}/#logo`,
+        url: new URL(logo, `${baseUrl}/`).toString(),
+      },
+
+      image: new URL(image, `${baseUrl}/`).toString(),
+
+      ...(phone ? { telephone: phone } : {}),
+      ...(email ? { email } : {}),
+
+      ...(address
+        ? {
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: address,
+            },
+          }
+        : {}),
+    },
+
+    {
+      "@type": "WebSite",
+      "@id": websiteId,
+
+      url: `${baseUrl}/`,
+      name: siteName,
+      description,
+
+      inLanguage: "ar",
+
+      publisher: {
+        "@id": organizationId,
+      },
+    },
+
+    {
+      "@type": pageType,
+      "@id": webpageId,
+
+      url: currentPageUrl,
+      name: title,
+      description,
+
+      inLanguage: "ar",
+
+      isPartOf: {
+        "@id": websiteId,
+      },
+
+      about: {
+        "@id": organizationId,
+      },
+
+      primaryImageOfPage: {
+        "@type": "ImageObject",
+        url: new URL(image, `${baseUrl}/`).toString(),
+      },
+    },
+  ],
+};
+---
+
+<JsonLd data={schema} />

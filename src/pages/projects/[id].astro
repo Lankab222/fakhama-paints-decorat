@@ -1,0 +1,486 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getEntry } from "astro:content";
+import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
+import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
+import RelatedProjects from "../../components/projects/RelatedProjects.astro";
+import ProjectNavigation from "../../components/projects/ProjectNavigation.astro";
+
+export const getStaticPaths = (async () => {
+  const projects = await getCollection("projects", ({ data }) => !data.draft);
+
+  return projects.map((project) => ({
+    params: {
+      id: project.id,
+    },
+    props: {
+      project,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const allProjects = (await getCollection("projects"))
+  .filter((item) => !item.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const currentIndex = allProjects.findIndex((item) => item.id === project.id);
+
+const previousProject =
+  currentIndex > 0 ? allProjects[currentIndex - 1] : undefined;
+
+const nextProject =
+  currentIndex >= 0 && currentIndex < allProjects.length - 1
+    ? allProjects[currentIndex + 1]
+    : undefined;
+
+const relatedProjects = allProjects
+  .filter(
+    (item) =>
+      item.id !== project.id &&
+      (item.data.category === project.data.category ||
+        item.data.services.some((serviceName) =>
+          project.data.services.includes(serviceName),
+        )),
+  )
+  .slice(0, 3);
+
+const settingsEntry = await getEntry("settings", "site");
+
+if (!settingsEntry) {
+  throw new Error("ملف إعدادات الموقع غير موجود");
+}
+
+const settings = settingsEntry.data;
+
+const projectUrl = new URL(
+  `/projects/${project.id}/`,
+  settings.siteUrl,
+).toString();
+const pageTitle = project.data.seoTitle || project.data.title;
+
+const pageDescription = project.data.seoDescription || project.data.description;
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  image={project.data.coverImage}
+>
+  <Fragment slot="head">
+    <BreadcrumbSchema
+      items={[
+        {
+          name: "الرئيسية",
+          url: settings.siteUrl,
+        },
+        {
+          name: "المشاريع",
+          url: new URL("/projects/", settings.siteUrl).toString(),
+        },
+        {
+          name: project.data.title,
+          url: projectUrl,
+        },
+      ]}
+    />
+  </Fragment>
+  <main>
+    <Breadcrumbs
+      items={[
+        {
+          label: "الرئيسية",
+          href: "/",
+        },
+        {
+          label: "المشاريع",
+          href: "/projects/",
+        },
+        {
+          label: project.data.title,
+        },
+      ]}
+    />
+    <article>
+      <header class="project-header section">
+        <div class="container">
+          <span>{project.data.category}</span>
+          <h1>{project.data.title}</h1>
+          <p>{project.data.description}</p>
+        </div>
+      </header>
+
+      {
+        project.data.coverImage && (
+          <div class="container">
+            <figure class="project-cover">
+              <img
+                src={project.data.coverImage}
+                alt={project.data.coverImageAlt || project.data.title}
+                width="1200"
+                height="800"
+                loading="eager"
+                decoding="async"
+              />
+            </figure>
+          </div>
+        )
+      }
+
+      <div class="container project-layout section">
+        <div class="project-content prose">
+          <Content />
+        </div>
+
+        <aside class="project-details">
+          <h2>تفاصيل المشروع</h2>
+
+          {
+            project.data.location && (
+              <p>
+                <strong>الموقع:</strong>
+                <span>{project.data.location}</span>
+              </p>
+            )
+          }
+
+          {
+            project.data.completionDate && (
+              <p>
+                <strong>تاريخ الإنجاز:</strong>
+                <span>
+                  {project.data.completionDate.toLocaleDateString("ar-SA", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </p>
+            )
+          }
+
+          {
+            project.data.services.length > 0 && (
+              <>
+                <h3>الخدمات المقدمة</h3>
+                <ul>
+                  {project.data.services.map((service) => (
+                    <li>{service}</li>
+                  ))}
+                </ul>
+              </>
+            )
+          }
+        </aside>
+      </div>
+
+      {
+        project.data.gallery.length > 0 && (
+          <section class="section gallery-section">
+            <div class="container">
+              <header class="gallery-header">
+                <span>معرض المشروع</span>
+                <h2>صور من التنفيذ</h2>
+              </header>
+
+              <div class="gallery">
+                {project.data.gallery.map((item, index) => (
+                  <figure
+                    class:list={[
+                      "gallery-item",
+                      index === 0 && "gallery-item--large",
+                    ]}
+                  >
+                    <a
+                      href={item.image}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`فتح الصورة: ${item.alt}`}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.alt}
+                        width="1000"
+                        height="760"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </a>
+
+                    <figcaption>{item.alt}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </section>
+        )
+      }
+      <section class="project-cta">
+        <div>
+          <span>مشروع مشابه</span>
+
+          <h2>هل تريد مشروعًا مشابهًا؟</h2>
+
+          <p>تواصل معنا لمناقشة فكرتك ومتطلباتك والبدء في تنفيذها.</p>
+        </div>
+
+        <a href="/contact/"> ابدأ مشروعك </a>
+      </section>
+      <ProjectNavigation
+        previous={previousProject
+          ? {
+              title: previousProject.data.title,
+              href: `/projects/${previousProject.id}/`,
+            }
+          : undefined}
+        next={nextProject
+          ? {
+              title: nextProject.data.title,
+              href: `/projects/${nextProject.id}/`,
+            }
+          : undefined}
+      />
+
+      <RelatedProjects projects={relatedProjects} />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .project-cta {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 3rem;
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 72%, black)
+    );
+    color: white;
+  }
+
+  .project-cta > div > span {
+    font-weight: 800;
+    opacity: 0.8;
+  }
+
+  .project-cta h2 {
+    margin-block: 0.45rem 0.65rem;
+  }
+
+  .project-cta p {
+    margin: 0;
+    color: rgb(255 255 255 / 82%);
+  }
+
+  .project-cta a {
+    display: inline-flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    padding-inline: 1.25rem;
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  @media (min-width: 760px) {
+    .project-cta {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+  }
+  .gallery-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .gallery-header span {
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  .gallery-header h2 {
+    margin-block: 0.5rem 0;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+  }
+
+  .gallery {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .gallery-item {
+    overflow: hidden;
+    margin: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-background);
+  }
+
+  .gallery-item a {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 350ms ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.035);
+  }
+
+  .gallery-item figcaption {
+    padding: 0.75rem 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  @media (min-width: 760px) {
+    .gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .gallery-item--large {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .gallery {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .gallery-item--large {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+  }
+  .project-header {
+    text-align: center;
+  }
+
+  .project-header .container {
+    max-width: 850px;
+  }
+
+  .project-header span {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .project-header h1 {
+    margin-block: 0.75rem 1rem;
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    line-height: 1.2;
+  }
+
+  .project-header p {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+  }
+
+  .project-cover {
+    overflow: hidden;
+    margin: 0;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .project-cover img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+
+  .project-layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .project-content {
+    min-width: 0;
+    font-size: 1.075rem;
+  }
+
+  .project-content :global(h2) {
+    margin-block: 2.5rem 1rem;
+  }
+
+  .project-content :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .project-details {
+    align-self: start;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .project-details p {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .project-details ul {
+    padding-inline-start: 1.25rem;
+  }
+
+  .gallery-section {
+    background: var(--color-surface);
+  }
+
+  .gallery {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .gallery figure {
+    overflow: hidden;
+    margin: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .gallery img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  @media (min-width: 768px) {
+    .gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 900px) {
+    .project-layout {
+      grid-template-columns: minmax(0, 1fr) 320px;
+    }
+
+    .project-details {
+      position: sticky;
+      top: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .gallery {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

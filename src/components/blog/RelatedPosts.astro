@@ -1,0 +1,113 @@
+---
+interface PostItem {
+  id: string;
+
+  data: {
+    title: string;
+    description: string;
+    image?: string;
+    imageAlt?: string;
+    category: string;
+    publishDate: Date;
+  };
+}
+
+interface Props {
+  posts: PostItem[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <section class="related-posts">
+      <h2>منشورات قد تهمك</h2>
+
+      <div class="related-grid">
+        {posts.map((post) => (
+          <article>
+            {post.data.image && (
+              <a href={`/blog/${post.id}/`}>
+                <img
+                  src={post.data.image}
+                  alt={post.data.imageAlt || post.data.title}
+                  width="600"
+                  height="380"
+                  loading="lazy"
+                />
+              </a>
+            )}
+
+            <div>
+              <span>{post.data.category}</span>
+
+              <h3>
+                <a href={`/blog/${post.id}/`}>
+                  {post.data.title}
+                </a>
+              </h3>
+
+              <p>{post.data.description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .related-posts {
+    margin-top: 4rem;
+  }
+
+  .related-posts > h2 {
+    margin-bottom: 1.5rem;
+    font-size: clamp(1.7rem, 4vw, 2.5rem);
+  }
+
+  .related-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .related-grid article {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .related-grid img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .related-grid article > div {
+    padding: 1.15rem;
+  }
+
+  .related-grid span {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+
+  .related-grid h3 {
+    margin-block: 0.55rem;
+    font-size: 1.1rem;
+  }
+
+  .related-grid p {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+  }
+
+  @media (min-width: 700px) {
+    .related-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

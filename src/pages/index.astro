@@ -1,0 +1,219 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroSection from "../components/home/HeroSection.astro";
+import FeaturedServices from "../components/home/FeaturedServices.astro";
+import TestimonialsSection from "../components/home/TestimonialsSection.astro";
+import FaqSection from "../components/home/FaqSection.astro";
+import FaqSchema from "../components/schema/FaqSchema.astro";
+import AboutSection from "../components/home/AboutSection.astro";
+import FeaturedProjects from "../components/home/FeaturedProjects.astro";
+import LatestPosts from "../components/home/LatestPosts.astro";
+import ContactCta from "../components/home/ContactCta.astro";
+
+const settingsEntry = await getEntry("settings", "site");
+
+if (!settingsEntry) {
+  throw new Error("ملف إعدادات الموقع غير موجود");
+}
+
+const featuredProjects = (await getCollection("projects"))
+  .filter(
+    (project) =>
+      !project.data.draft &&
+      project.data.featured,
+  )
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 5);
+
+const latestPosts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort(
+    (a, b) =>
+      b.data.publishDate.getTime() -
+      a.data.publishDate.getTime(),
+  )
+  .slice(0, 3);
+
+const settings = settingsEntry.data;
+
+const featuredServices = (await getCollection("services"))
+  .filter(
+    (service) =>
+      !service.data.draft &&
+      service.data.featured,
+  )
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 6);
+
+const faqItems = (await getCollection("faq"))
+  .filter((item) => item.data.published)
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((item) => ({
+    question: item.data.question,
+    answer: item.data.answer,
+  }));
+
+const testimonials = (await getCollection("testimonials"))
+  .filter((item) => item.data.published)
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((item) => item.data);
+---
+
+<BaseLayout
+  title={settings.siteTitle}
+  description={settings.description}
+  image={settings.heroImage || settings.defaultImage}
+>
+  <Fragment slot="head">
+    {
+      faqItems.length > 0 && (
+        <FaqSchema items={faqItems} />
+      )
+    }
+  </Fragment>
+
+  <main id="main-content">
+  <HeroSection
+    badge={settings.heroBadge}
+    title={settings.heroTitle}
+    description={settings.heroDescription}
+    image={settings.heroImage}
+    imageAlt={settings.heroImageAlt}
+    primaryButtonText={settings.heroPrimaryButtonText}
+    primaryButtonUrl={settings.heroPrimaryButtonUrl}
+    secondaryButtonText={settings.heroSecondaryButtonText}
+    secondaryButtonUrl={settings.heroSecondaryButtonUrl}
+  />
+
+  <FeaturedServices services={featuredServices} />
+
+  <AboutSection
+    badge={settings.aboutBadge}
+    title={settings.aboutTitle}
+    description={settings.aboutDescription}
+    image={settings.aboutImage}
+    imageAlt={settings.aboutImageAlt}
+    buttonText={settings.aboutButtonText}
+    buttonUrl={settings.aboutButtonUrl}
+    features={settings.aboutFeatures}
+  />
+
+  <FeaturedProjects projects={featuredProjects} />
+
+  
+
+  <LatestPosts posts={latestPosts} />
+  <TestimonialsSection items={testimonials} />
+
+  <FaqSection items={faqItems} />
+
+  <ContactCta
+    title={settings.ctaTitle}
+    description={settings.ctaDescription}
+    buttonText={settings.ctaButtonText}
+    buttonUrl={settings.ctaButtonUrl}
+    phone={settings.phone}
+    whatsapp={settings.whatsapp}
+  />
+</main>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    min-height: 78svh;
+    place-items: center;
+    padding-block: 5rem;
+    background:
+      radial-gradient(
+        circle at top right,
+        rgb(22 101 52 / 12%),
+        transparent 38%
+      ),
+      var(--color-background);
+  }
+
+  .hero__content {
+    max-width: 800px;
+    text-align: center;
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    margin-bottom: 1rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-secondary);
+    color: var(--color-primary-dark);
+    font-weight: 700;
+  }
+
+  h1 {
+    margin-bottom: 1.25rem;
+    font-size: clamp(2.4rem, 8vw, 5rem);
+    line-height: 1.1;
+  }
+
+  .hero p {
+    max-width: 680px;
+    margin-inline: auto;
+    color: var(--color-text-muted);
+    font-size: clamp(1rem, 3vw, 1.25rem);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .button {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    transition:
+      transform var(--transition),
+      background-color var(--transition);
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+  }
+
+  .button--primary {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .button--secondary {
+    border-color: var(--color-border);
+    background: white;
+  }
+
+  .features {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .feature {
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  @media (min-width: 768px) {
+    .features {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

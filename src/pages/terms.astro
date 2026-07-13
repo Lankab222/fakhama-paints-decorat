@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="شروط الاستخدام"
+  description="شروط الاستخدام الخاصة بالموقع."
+>
+  <main class="section">
+    <article class="container legal-page">
+      <h1>شروط الاستخدام</h1>
+
+      <p>
+        توضح هذه الصفحة كيفية التعامل مع البيانات والمعلومات التي
+        يرسلها الزوار عبر الموقع.
+      </p>
+
+      <h2>المعلومات التي نجمعها</h2>
+
+      <p>
+        قد نجمع المعلومات التي يرسلها المستخدم طوعًا من خلال نماذج
+        التواصل، مثل الاسم ورقم الهاتف والبريد الإلكتروني.
+      </p>
+
+      <h2>استخدام المعلومات</h2>
+
+      <p>
+        تُستخدم المعلومات للرد على الاستفسارات وتقديم الخدمات المطلوبة،
+        ولا تُباع بيانات المستخدمين لأطراف أخرى.
+      </p>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .legal-page {
+    max-width: 850px;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 7vw, 4rem);
+  }
+
+  h2 {
+    margin-block: 2rem 0.75rem;
+  }
+
+  p {
+    color: var(--color-text-muted);
+  }
+</style>

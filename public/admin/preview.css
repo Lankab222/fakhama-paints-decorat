@@ -1,0 +1,21 @@
+body {
+  direction: rtl;
+  font-family: "Cairo", sans-serif;
+  line-height: 1.9;
+  color: #222;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.4;
+}

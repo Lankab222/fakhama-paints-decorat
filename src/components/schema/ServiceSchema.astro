@@ -24,19 +24,13 @@ const {
 const schema = {
   "@context": "https://schema.org",
   "@type": "Service",
-
   name,
   description,
   url,
-
   ...(image ? { image } : {}),
-
   provider: {
-    "@type": "Organization",
-    name: providerName,
-    url: providerUrl,
-  },
-
+  "@id": `${providerUrl.replace(/\/$/, "")}/#organization`,
+},
   ...(areaServed
     ? {
         areaServed: {

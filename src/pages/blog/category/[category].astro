@@ -29,13 +29,13 @@ const { category, posts } = Astro.props;
   title={`تصنيف ${category}`}
   description={`المنشورات التابعة لتصنيف ${category}.`}
 >
-  <main>
+  <main id="main-content">
     <PageHero
       eyebrow="تصنيف المنشورات"
       title={category}
       description={`جميع المقالات والمنشورات التابعة لتصنيف ${category}.`}
     />
-
+    
     <section class="section">
       <div class="container">
         {

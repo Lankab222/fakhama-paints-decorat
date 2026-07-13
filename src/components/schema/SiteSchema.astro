@@ -32,10 +32,7 @@ const {
 
 const baseUrl = siteUrl.replace(/\/$/, "");
 
-const currentPageUrl = new URL(
-  Astro.url.pathname,
-  `${baseUrl}/`,
-).toString();
+const currentPageUrl = new URL(Astro.url.pathname, `${baseUrl}/`).toString();
 
 const organizationId = `${baseUrl}/#organization`;
 const websiteId = `${baseUrl}/#website`;
@@ -46,43 +43,31 @@ const schema = {
 
   "@graph": [
     {
-      "@type": "Organization",
+      "@type": ["LocalBusiness", "HomeAndConstructionBusiness"],
       "@id": organizationId,
-
       name: siteName,
       url: `${baseUrl}/`,
-
+      telephone: phone,
+      image: new URL(image, `${baseUrl}/`).toString(),
       logo: {
         "@type": "ImageObject",
-        "@id": `${baseUrl}/#logo`,
         url: new URL(logo, `${baseUrl}/`).toString(),
       },
-
-      image: new URL(image, `${baseUrl}/`).toString(),
-
-      ...(phone ? { telephone: phone } : {}),
-      ...(email ? { email } : {}),
-
-      ...(address
-        ? {
-            address: {
-              "@type": "PostalAddress",
-              streetAddress: address,
-            },
-          }
-        : {}),
+      address: {
+    "@type": "PostalAddress",
+    addressLocality: "مكة المكرمة",
+    addressRegion: "مكة المكرمة",
+    addressCountry: "SA",
+  },
     },
 
     {
       "@type": "WebSite",
       "@id": websiteId,
-
       url: `${baseUrl}/`,
       name: siteName,
       description,
-
       inLanguage: "ar",
-
       publisher: {
         "@id": organizationId,
       },
@@ -91,21 +76,16 @@ const schema = {
     {
       "@type": pageType,
       "@id": webpageId,
-
       url: currentPageUrl,
       name: title,
       description,
-
       inLanguage: "ar",
-
       isPartOf: {
         "@id": websiteId,
       },
-
       about: {
         "@id": organizationId,
       },
-
       primaryImageOfPage: {
         "@type": "ImageObject",
         url: new URL(image, `${baseUrl}/`).toString(),

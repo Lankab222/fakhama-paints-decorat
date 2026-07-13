@@ -1,12 +1,12 @@
 export const siteConfig = {
-  name: "Alraqabi Astro Starter",
+  name: "دهانات وديكورات الفخامة",
 
-  title: "قالب عربي احترافي مبني باستخدام Astro",
+  title: "دهانات وديكوات الفخامة | افضل معلم دهانات 0543441970 ",
 
   description:
     "قالب Astro عربي سريع ومتجاوب، يدعم SEO وMarkdown وDecap CMS وCloudflare Pages.",
 
-  url: "https://example.com",
+  url: "https://alfakhama.site",
 
   locale: "ar-SA",
 
@@ -15,14 +15,14 @@ export const siteConfig = {
   direction: "rtl",
 
   author: {
-    name: "Mohammed Alraqabi",
+    name: "ابو محمد",
   },
 
   contact: {
-    phone: "",
-    whatsapp: "",
-    email: "",
-    address: "",
+    phone: "+96543441970",
+    whatsapp: "966543441970",
+    email: "info@alfakhama.site",
+    address: "المملكة العربية السعودية - مكة المكرمة",
   },
 
   social: {

@@ -16,7 +16,7 @@ const blog = defineCollection({
     imageAlt: z.string().optional(),
     category: z.string().default("عام"),
     tags: z.array(z.string()).default([]),
-    author: z.string().default("محمد الرقابي"),
+    author: z.string().default("ابو محمد"),
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),
   }),

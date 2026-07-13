@@ -22,7 +22,7 @@ const categories = [...new Set(posts.map((post) => post.data.category))].sort(
     title="أحدث المقالات والمنشورات"
     description="أحدث المقالات والمنشورات والصور حول اعمال الدهانات والديكورا التي نقدمها"
   />
-  <main class="section blog-list">
+  <main class="section blog-list" id="main-content">
     <div class="container">
       <BlogFilters categories={categories} />
       {

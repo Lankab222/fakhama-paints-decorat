@@ -1,8 +1,11 @@
 local_backend: true
 
 backend:
-  name: git-gateway
+  name: github
+  repo: Lankab222/fakhama-paints-decorat
   branch: main
+  base_url: https://decap-oauth.example.workers.dev 
+  auth_endpoint: auth
 
 locale: ar
 

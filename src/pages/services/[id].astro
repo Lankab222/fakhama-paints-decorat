@@ -8,6 +8,7 @@ import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
 import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
 import RelatedServices from "../../components/services/RelatedServices.astro";
 
+
 export const getStaticPaths = (async () => {
   const services = await getCollection("services", ({ data }) => !data.draft);
 
@@ -131,6 +132,7 @@ const pageDescription = service.data.seoDescription || service.data.description;
         <div class="service__content prose">
           <Content />
         </div>
+    
 
         {
           service.data.features.length > 0 && (
@@ -149,6 +151,7 @@ const pageDescription = service.data.seoDescription || service.data.description;
             </aside>
           )
         }
+        
       </div>
       
       <RelatedServices services={relatedServices} />

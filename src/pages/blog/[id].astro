@@ -8,6 +8,7 @@ import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
 import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
 import ShareButtons from "../../components/blog/ShareButtons.astro";
 import RelatedPosts from "../../components/blog/RelatedPosts.astro";
+import PostContactButtons from "../../components/blog/PostContactButtons.astro";
 
 export const getStaticPaths = (async () => {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
@@ -189,6 +190,14 @@ const logoUrl = new URL(
         <div class="article__content prose">
           <Content />
         </div>
+      
+      <PostContactButtons
+  phone="+966543441970"
+  whatsapp="966543441970"
+  title="هل تحتاج إلى تنفيذ هذه الخدمة؟"
+  whatsappMessage={`مرحبًا، أريد الاستفسار عن: ${post.data.title}`}
+/>
+
 
         <ShareButtons
           title={post.data.title}

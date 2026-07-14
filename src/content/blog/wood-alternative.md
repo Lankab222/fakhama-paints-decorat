@@ -6,7 +6,7 @@ description: عوازل الأسطح من الحلول الأساسية لحما
   الحديثة،
 publishDate: 2026-01-01
 updatedDate: 2026-07-01
-image: /uploads/Paints (4).jpg
+image: /uploads/عوازل-اسطح-في-الرياض-10.webp
 imageAlt: عوازل الأسطح
 category: عوازل الأسطح
 tags:

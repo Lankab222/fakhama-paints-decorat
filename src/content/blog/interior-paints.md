@@ -3,7 +3,7 @@ title: الدهانات الداخلية والدهانات الديكورية
 description: تنفيذ اعمال الدهانات الداخلية والدهانات الديكورية
 publishDate: 2026-07-12
 updatedDate: 2026-07-12
-image: /uploads/Paints (1).jpg
+image: /uploads/Paints (4).jpg
 imageAlt: دهانات وديكورات الفخامة
 category: دهانات داخلية
 tags:

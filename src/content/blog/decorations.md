@@ -3,7 +3,7 @@ title: ديكورات
 description: ديكورات الجبس بورد والأسقف المعلقة والورق وجميع انواع الديكورات
 publishDate: 2026-07-13
 updatedDate: 2026-07-13
-image: /uploads/Dicorat.webp
+image: /uploads/hero-image.webp
 imageAlt: دهانت وديكورات الفخامة
 category: ديكورات
 tags:

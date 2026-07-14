@@ -3,7 +3,7 @@ title: الدهانات الخارجية وطلاء الواجهات
 description: تنفيذ اعمال الدهانات وطلاء الواجهات
 publishDate: 2026-07-12
 updatedDate: 2026-07-12
-image: /uploads/Paint-Out.webp
+image: /uploads/دهانات-خارجية-الرياض-7.webp
 imageAlt: دهانات وديكورات الفخامة
 category: دهانات خارجية
 tags:

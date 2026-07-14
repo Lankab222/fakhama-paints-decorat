@@ -4,7 +4,7 @@ description: "تنفيذ دهانات الواجهات الداخلية والخ
 category: مشاريع
 location: الرياض
 completionDate: 2026-07-01
-coverImage: /uploads/Paint-Out.webp
+coverImage: /uploads/ترميم-وتشطيب-في-الرياض-30.webp
 coverImageAlt: دهانات وديكورات الفخامة
 gallery:
   - image: /uploads/about-image.webp

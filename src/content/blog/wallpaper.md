@@ -4,7 +4,7 @@ description: خيار سريع ومتعدد التصاميم لتغيير مظه
   الحديث والكلاسيكي.
 publishDate: 2026-01-01
 updatedDate: 2026-07-01
-image: /uploads/hero-image.webp
+image: /uploads/ورق-جدران-الرياض-4.webp
 imageAlt: ورق الجدران
 category: ورق الجدران
 tags:

@@ -7,7 +7,7 @@ import ServiceSchema from "../../components/schema/ServiceSchema.astro";
 import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
 import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
 import RelatedServices from "../../components/services/RelatedServices.astro";
-
+import PostContactButtons from "../../components/blog/PostContactButtons.astro";
 
 export const getStaticPaths = (async () => {
   const services = await getCollection("services", ({ data }) => !data.draft);
@@ -151,10 +151,16 @@ const pageDescription = service.data.seoDescription || service.data.description;
             </aside>
           )
         }
-        
+         <PostContactButtons
+  phone="+966543441970"
+  whatsapp="966543441970"
+  title="هل تحتاج إلى تنفيذ هذه الخدمة؟"
+  whatsappMessage={`مرحبًا، أريد الاستفسار عن: خدماتكم`}
+/>
+<RelatedServices services={relatedServices} />
       </div>
       
-      <RelatedServices services={relatedServices} />
+      
     </article>
   </main>
 </BaseLayout>

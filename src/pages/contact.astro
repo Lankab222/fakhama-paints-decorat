@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getEntry } from "astro:content";
 import PageHero from "../components/common/PageHero.astro";
+import PostContactButtons from "../components/blog/PostContactButtons.astro";
 
 const settingsEntry = await getEntry("settings", "site");
 
@@ -22,6 +23,12 @@ const settings = settingsEntry.data;
   eyebrow="اتصل بنا"
   title="يسعدنا تواصلك معنا"
   description="تواصل معنا لطلب خدمة، مناقشة مشروع جديد، أو للحصول على استشارة أولية."
+/>
+ <PostContactButtons
+  phone="+966543441970"
+  whatsapp="966543441970"
+  title="هل تحتاج إلى تنفيذ هذه الخدمة؟"
+  whatsappMessage={`مرحبًا، أريد الاستفسار عن: خدماتكم`}
 />
     <section class="section">
       <div class="container contact-layout">

@@ -4,7 +4,7 @@ description: ألواح ديكورية تمنح مظهر الرخام بتكلف
   الداخلية والخلفيات الحديثة.
 publishDate: 2026-01-01
 updatedDate: 2026-07-01
-image: /uploads/Paints (3).jpg
+image: /uploads/تركيب-بديل-الرخام-في-الرياض-21.webp
 imageAlt: بديل الرخام
 category: بديل الرخام
 tags:

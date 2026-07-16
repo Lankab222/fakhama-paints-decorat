@@ -2,7 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/common/PageHero.astro";
-
+import SiteSchema from "../../components/schema/SiteSchema.astro";
 const services = (await getCollection("services"))
   .filter((service) => !service.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
@@ -12,6 +12,41 @@ const services = (await getCollection("services"))
   title="خدمات الدهانات والديكورات التي نقدمها"
   description="تعرف على خدمات دهانات وديكورات الفخامة في الدهانات الداخلية والخارجية، والديكورات، والعوازل، والترميمات بمكة المكرمة."
 >
+<Fragment slot="head">
+    <SiteSchema
+  siteName="دهانات وديكورات الفخامة"
+  siteUrl="https://alfakhama.site"
+  siteDescription="تنفيذ أعمال الدهانات والديكورات والعوازل والترميمات في مكة المكرمة."
+
+  title="خدماتنا  | دهانات وديكورات الفخامة"
+  description="تعرف على خبرة دهانات وديكورات الفخامة وخدماتنا في مكة المكرمة."
+
+  phone="+966543441970"
+
+  address={{
+    addressLocality: "مكة المكرمة",
+    addressRegion: "مكة المكرمة",
+    addressCountry: "SA",
+    streetAddress: "العزيزية",
+    postalCode: "12455",
+  }}
+
+  pageType="CollectionPage"
+
+  breadcrumbs={[
+    {
+      name: "الرئيسية",
+      url: "/",
+    },
+    {
+      name: "خدماتنا",
+      url: "/services/",
+    },
+  ]}
+/>
+     
+     
+  </Fragment>
   <main id="main-content">
     <PageHero
   eyebrow="خدماتنا"

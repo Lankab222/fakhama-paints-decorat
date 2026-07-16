@@ -4,10 +4,18 @@ interface Props {
 }
 
 const { data } = Astro.props;
+
+/**
+ * استبدال علامة < يمنع احتمال تفسير محتوى JSON
+ * كوسم HTML عند وجود نصوص ديناميكية.
+ */
+const jsonLd = JSON.stringify(data).replace(
+  /</g,
+  "\\u003c"
+);
 ---
 
 <script
   type="application/ld+json"
-  is:inline
-  set:html={JSON.stringify(data)}
-></script>
+  set:html={jsonLd}
+/>

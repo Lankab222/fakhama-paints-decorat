@@ -1,96 +1,329 @@
 ---
 import JsonLd from "./JsonLd.astro";
 
+type PageType =
+  | "WebPage"
+  | "AboutPage"
+  | "ContactPage"
+  | "CollectionPage";
+
+interface PostalAddress {
+  streetAddress?: string;
+  addressLocality?: string;
+  addressRegion?: string;
+  postalCode?: string;
+  addressCountry?: string;
+}
+
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
 interface Props {
   siteName: string;
-  siteUrl: string;
+
+  /**
+   * يمكن تمريره يدويًا، أو الاعتماد على site
+   * داخل astro.config.mjs
+   */
+  siteUrl?: string;
+
+  /**
+   * وصف ثابت للموقع والنشاط
+   */
+  siteDescription: string;
+
+  /**
+   * بيانات الصفحة الحالية
+   */
   title: string;
   description: string;
 
-  logo?: string;
-  image?: string;
+  /**
+   * رابط Canonical اختياري.
+   * يقبل رابطًا نسبيًا أو كاملًا.
+   */
+  canonicalUrl?: string;
 
+  /**
+   * بيانات النشاط
+   */
+  logo?: string;
+  businessImage?: string;
   phone?: string;
   email?: string;
-  address?: string;
+  address?: PostalAddress;
+  areaServed?: string[];
+  sameAs?: string[];
 
-  pageType?: "WebPage" | "AboutPage" | "ContactPage";
+  /**
+   * بيانات الصفحة الحالية
+   */
+  pageImage?: string;
+  pageType?: PageType;
+
+  /**
+   * مسار التنقل للصفحات الداخلية
+   */
+  breadcrumbs?: BreadcrumbItem[];
 }
 
 const {
   siteName,
   siteUrl,
+  siteDescription,
+
   title,
   description,
-  logo = "/favicon.svg",
-  image = "/og-default.jpg",
+  canonicalUrl,
+
+  logo = "/uploads/logo2.webp",
+  businessImage = "/uploads/hero-image.webp",
+
   phone,
   email,
-  address,
+  address ,
+  areaServed = [],
+  sameAs = [],
+
+  pageImage,
   pageType = "WebPage",
+  breadcrumbs = [],
 } = Astro.props;
 
-const baseUrl = siteUrl.replace(/\/$/, "");
+const baseUrl = (
+  siteUrl ??
+  Astro.site?.toString() ??
+  ""
+).replace(/\/+$/, "");
 
-const currentPageUrl = new URL(Astro.url.pathname, `${baseUrl}/`).toString();
+if (!baseUrl) {
+  throw new Error(
+    "يجب تحديد siteUrl أو إضافة site داخل astro.config.mjs"
+  );
+}
 
-const organizationId = `${baseUrl}/#organization`;
-const websiteId = `${baseUrl}/#website`;
+/**
+ * تحويل أي رابط نسبي إلى رابط كامل
+ */
+const toAbsoluteUrl = (value: string) =>
+  new URL(value, `${baseUrl}/`).toString();
+
+/**
+ * رابط الصفحة الحالي بدون query parameters
+ */
+const currentPageUrl = canonicalUrl
+  ? toAbsoluteUrl(canonicalUrl)
+  : new URL(Astro.url.pathname, `${baseUrl}/`).toString();
+
+const homeUrl = `${baseUrl}/`;
+
+const organizationId = `${homeUrl}#organization`;
+const websiteId = `${homeUrl}#website`;
+const logoId = `${homeUrl}#logo`;
+const businessImageId = `${homeUrl}#business-image`;
+
 const webpageId = `${currentPageUrl}#webpage`;
+const breadcrumbId = `${currentPageUrl}#breadcrumb`;
+
+const logoUrl = toAbsoluteUrl(logo);
+const businessImageUrl = toAbsoluteUrl(businessImage);
+
+const pageImageUrl = toAbsoluteUrl(
+  pageImage ?? businessImage
+);
+
+/**
+ * إذا كانت صورة الصفحة هي نفسها صورة النشاط،
+ * نستخدم نفس العقدة بدل إنشاء صورة مكررة.
+ */
+const primaryImageId =
+  pageImageUrl === businessImageUrl
+    ? businessImageId
+    : `${currentPageUrl}#primaryimage`;
+
+const organizationNode = {
+  "@type": "HomeAndConstructionBusiness",
+  "@id": organizationId,
+
+  name: siteName,
+  url: homeUrl,
+  description: siteDescription,
+
+  logo: {
+    "@id": logoId,
+  },
+
+  image: {
+    "@id": businessImageId,
+  },
+
+  ...(phone && {
+    telephone: phone,
+
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: phone,
+      contactType: "customer service",
+      areaServed: "SA",
+      availableLanguage: ["ar"],
+    },
+  }),
+
+  ...(email && {
+    email,
+  }),
+
+  // ...(address && {
+  //   address: {
+  //     "@type": "PostalAddress",
+  //     ...address,
+  //   },
+  // }),
+ ...(address&& {
+    address: {
+      "@type": "PostalAddress",
+      "streetAddress": address.streetAddress,
+      "addressLocality": address.addressLocality,
+      "addressRegion": address.addressRegion,
+      "postalCode": address.postalCode,
+      "addressCountry": address.addressCountry,
+    }}),
+      
+  ...(areaServed.length > 0 && {
+    areaServed: areaServed.map((city) => ({
+      "@type": "City",
+      name: city,
+    })),
+  }),
+
+  ...(sameAs.length > 0 && {
+    sameAs,
+  }),
+};
+
+const logoNode = {
+  "@type": "ImageObject",
+  "@id": logoId,
+
+  url: logoUrl,
+  contentUrl: logoUrl,
+  caption: `شعار ${siteName}`,
+  inLanguage: "ar-SA",
+};
+
+const businessImageNode = {
+  "@type": "ImageObject",
+  "@id": businessImageId,
+
+  url: businessImageUrl,
+  contentUrl: businessImageUrl,
+  caption: siteName,
+  inLanguage: "ar-SA",
+};
+
+const websiteNode = {
+  "@type": "WebSite",
+  "@id": websiteId,
+
+  url: homeUrl,
+  name: siteName,
+  description: siteDescription,
+  inLanguage: "ar-SA",
+
+  publisher: {
+    "@id": organizationId,
+  },
+};
+
+const webpageNode = {
+  "@type": pageType,
+  "@id": webpageId,
+
+  url: currentPageUrl,
+  name: title,
+  description,
+  inLanguage: "ar-SA",
+
+  isPartOf: {
+    "@id": websiteId,
+  },
+
+  about: {
+    "@id": organizationId,
+  },
+
+  primaryImageOfPage: {
+    "@id": primaryImageId,
+  },
+
+  ...(breadcrumbs.length > 0 && {
+    breadcrumb: {
+      "@id": breadcrumbId,
+    },
+  }),
+
+  ...(
+    pageType === "AboutPage" ||
+    pageType === "ContactPage"
+      ? {
+          mainEntity: {
+            "@id": organizationId,
+          },
+        }
+      : {}
+  ),
+};
+
+const primaryImageNode =
+  pageImageUrl !== businessImageUrl
+    ? {
+        "@type": "ImageObject",
+        "@id": primaryImageId,
+
+        url: pageImageUrl,
+        contentUrl: pageImageUrl,
+        caption: title,
+        inLanguage: "ar-SA",
+      }
+    : null;
+
+const breadcrumbNode =
+  breadcrumbs.length > 0
+    ? {
+        "@type": "BreadcrumbList",
+        "@id": breadcrumbId,
+
+        itemListElement: breadcrumbs.map(
+          (item, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: item.name,
+            item: toAbsoluteUrl(item.url),
+          })
+        ),
+      }
+    : null;
 
 const schema = {
   "@context": "https://schema.org",
 
   "@graph": [
-    {
-      "@type": ["LocalBusiness", "HomeAndConstructionBusiness"],
-      "@id": organizationId,
-      name: siteName,
-      url: `${baseUrl}/`,
-      telephone: phone,
-      image: new URL(image, `${baseUrl}/`).toString(),
-      logo: {
-        "@type": "ImageObject",
-        url: new URL(logo, `${baseUrl}/`).toString(),
-      },
-      address: {
-    "@type": "PostalAddress",
-    addressLocality: "مكة المكرمة",
-    addressRegion: "مكة المكرمة",
-    addressCountry: "SA",
-  },
-    },
+    organizationNode,
+    logoNode,
+    businessImageNode,
+    websiteNode,
 
-    {
-      "@type": "WebSite",
-      "@id": websiteId,
-      url: `${baseUrl}/`,
-      name: siteName,
-      description,
-      inLanguage: "ar",
-      publisher: {
-        "@id": organizationId,
-      },
-    },
+    ...(primaryImageNode
+      ? [primaryImageNode]
+      : []),
 
-    {
-      "@type": pageType,
-      "@id": webpageId,
-      url: currentPageUrl,
-      name: title,
-      description,
-      inLanguage: "ar",
-      isPartOf: {
-        "@id": websiteId,
-      },
-      about: {
-        "@id": organizationId,
-      },
-      primaryImageOfPage: {
-        "@type": "ImageObject",
-        url: new URL(image, `${baseUrl}/`).toString(),
-      },
-    },
+    webpageNode,
+
+    ...(breadcrumbNode
+      ? [breadcrumbNode]
+      : []),
   ],
 };
 ---

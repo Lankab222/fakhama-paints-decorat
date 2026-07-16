@@ -10,6 +10,7 @@ import AboutSection from "../components/home/AboutSection.astro";
 import FeaturedProjects from "../components/home/FeaturedProjects.astro";
 import LatestPosts from "../components/home/LatestPosts.astro";
 import ContactCta from "../components/home/ContactCta.astro";
+import SiteSchema from "../components/schema/SiteSchema.astro";
 
 const settingsEntry = await getEntry("settings", "site");
 
@@ -66,13 +67,43 @@ const testimonials = (await getCollection("testimonials"))
   image={settings.heroImage || settings.defaultImage}
 >
   <Fragment slot="head">
+    <SiteSchema
+  siteName="دهانات وديكورات الفخامة"
+  siteUrl="https://alfakhama.site"
+  siteDescription="دهانات وديكورات الفخامة لتنفيذ الدهانات الداخلية والخارجية والديكورات والعوازل والمظلات والسواتر وأعمال الترميم في مكة المكرمة."
+
+  title="دهانات وديكورات الفخامة | دهانات وعوازل وترميمات بمكة المكرمة"
+  description="تنفيذ أعمال الدهانات الداخلية والخارجية والديكورات والعوازل والمظلات والسواتر والترميمات في مكة المكرمة بجودة عالية."
+
+  phone="+966543441970"
+  email="info@alfakhama.site"
+
+  logo="/uploads/logo2.webp"
+  businessImage="/uploads/hero-image.webp"
+
+   address={{
+    addressLocality: "مكة المكرمة",
+    addressRegion: "مكة المكرمة",
+    addressCountry: "SA",
+    streetAddress: "العزيزية",
+    postalCode: "12455",
+  }}
+  
+  areaServed={[
+    "مكة المكرمة"
+  ]}
+
+  pageType="WebPage"
+/>
     {
       faqItems.length > 0 && (
         <FaqSchema items={faqItems} />
+        
       )
     }
+     
   </Fragment>
-
+ 
   <main id="main-content">
   <HeroSection
     badge={settings.heroBadge}

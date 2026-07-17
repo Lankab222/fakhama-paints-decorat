@@ -1,14 +1,9 @@
 ---
 import JsonLd from "./JsonLd.astro";
 
-type PageType =
-  | "WebPage"
-  | "AboutPage"
-  | "ContactPage"
-  | "CollectionPage";
+type PageType = "WebPage" | "AboutPage" | "ContactPage" | "CollectionPage";
 
 interface PostalAddress {
-  streetAddress?: string;
   addressLocality?: string;
   addressRegion?: string;
   postalCode?: string;
@@ -19,7 +14,18 @@ interface BreadcrumbItem {
   name: string;
   url: string;
 }
-
+interface CollectionItem {
+  name: string;
+  url: string;
+  description?: string;
+  image?: string;
+}
+interface ServiceItem {
+  name: string;
+  url: string;
+  description?: string;
+  image?: string;
+}
 interface Props {
   siteName: string;
 
@@ -56,13 +62,13 @@ interface Props {
   address?: PostalAddress;
   areaServed?: string[];
   sameAs?: string[];
-
+  serviceItems?: ServiceItem[];
   /**
    * بيانات الصفحة الحالية
    */
   pageImage?: string;
   pageType?: PageType;
-
+  collectionItems?: CollectionItem[];
   /**
    * مسار التنقل للصفحات الداخلية
    */
@@ -80,28 +86,22 @@ const {
 
   logo = "/uploads/logo2.webp",
   businessImage = "/uploads/hero-image.webp",
-
+  serviceItems = [],
   phone,
   email,
-  address ,
+  address,
   areaServed = [],
   sameAs = [],
-
+  collectionItems = [],
   pageImage,
   pageType = "WebPage",
   breadcrumbs = [],
 } = Astro.props;
 
-const baseUrl = (
-  siteUrl ??
-  Astro.site?.toString() ??
-  ""
-).replace(/\/+$/, "");
+const baseUrl = (siteUrl ?? Astro.site?.toString() ?? "").replace(/\/+$/, "");
 
 if (!baseUrl) {
-  throw new Error(
-    "يجب تحديد siteUrl أو إضافة site داخل astro.config.mjs"
-  );
+  throw new Error("يجب تحديد siteUrl أو إضافة site داخل astro.config.mjs");
 }
 
 /**
@@ -126,13 +126,11 @@ const businessImageId = `${homeUrl}#business-image`;
 
 const webpageId = `${currentPageUrl}#webpage`;
 const breadcrumbId = `${currentPageUrl}#breadcrumb`;
-
+const itemListId = `${currentPageUrl}#itemlist`;
 const logoUrl = toAbsoluteUrl(logo);
 const businessImageUrl = toAbsoluteUrl(businessImage);
-
-const pageImageUrl = toAbsoluteUrl(
-  pageImage ?? businessImage
-);
+const servicesListId = `${currentPageUrl}#services-list`;
+const pageImageUrl = toAbsoluteUrl(pageImage ?? businessImage);
 
 /**
  * إذا كانت صورة الصفحة هي نفسها صورة النشاط،
@@ -181,16 +179,16 @@ const organizationNode = {
   //     ...address,
   //   },
   // }),
- ...(address&& {
+  ...(address && {
     address: {
       "@type": "PostalAddress",
-      "streetAddress": address.streetAddress,
-      "addressLocality": address.addressLocality,
-      "addressRegion": address.addressRegion,
-      "postalCode": address.postalCode,
-      "addressCountry": address.addressCountry,
-    }}),
-      
+      addressLocality: address.addressLocality,
+      addressRegion: address.addressRegion,
+      postalCode: address.postalCode,
+      addressCountry: address.addressCountry,
+    },
+  }),
+
   ...(areaServed.length > 0 && {
     areaServed: areaServed.map((city) => ({
       "@type": "City",
@@ -263,17 +261,23 @@ const webpageNode = {
       "@id": breadcrumbId,
     },
   }),
-
-  ...(
-    pageType === "AboutPage" ||
-    pageType === "ContactPage"
-      ? {
-          mainEntity: {
-            "@id": organizationId,
-          },
-        }
-      : {}
-  ),
+  ...(collectionItems.length > 0 && {
+    mainEntity: {
+      "@id": itemListId,
+    },
+  }),
+  ...(pageType === "AboutPage" || pageType === "ContactPage"
+    ? {
+        mainEntity: {
+          "@id": organizationId,
+        },
+      }
+    : {}),
+  ...(serviceItems.length > 0 && {
+    mainEntity: {
+      "@id": servicesListId,
+    },
+  }),
 };
 
 const primaryImageNode =
@@ -295,17 +299,100 @@ const breadcrumbNode =
         "@type": "BreadcrumbList",
         "@id": breadcrumbId,
 
-        itemListElement: breadcrumbs.map(
-          (item, index) => ({
-            "@type": "ListItem",
-            position: index + 1,
-            name: item.name,
-            item: toAbsoluteUrl(item.url),
-          })
-        ),
+        itemListElement: breadcrumbs.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          item: toAbsoluteUrl(item.url),
+        })),
       }
     : null;
 
+const collectionItemListNode =
+  collectionItems.length > 0
+    ? {
+        "@type": "ItemList",
+        "@id": itemListId,
+
+        name: `قائمة ${title}`,
+
+        numberOfItems: collectionItems.length,
+
+        itemListOrder: "https://schema.org/ItemListOrderDescending",
+
+        itemListElement: collectionItems.map((item, index) => {
+          const articleUrl = toAbsoluteUrl(item.url);
+
+          return {
+            "@type": "ListItem",
+            position: index + 1,
+
+            item: {
+              "@type": "BlogPosting",
+              "@id": `${articleUrl}#article`,
+
+              url: articleUrl,
+              headline: item.name,
+
+              ...(item.description && {
+                description: item.description,
+              }),
+
+              ...(item.image && {
+                image: toAbsoluteUrl(item.image),
+              }),
+            },
+          };
+        }),
+      }
+    : null;
+const servicesItemListNode =
+  serviceItems.length > 0
+    ? {
+        "@type": "ItemList",
+        "@id": servicesListId,
+
+        name: `قائمة خدمات ${siteName}`,
+
+        numberOfItems: serviceItems.length,
+
+        itemListOrder: "https://schema.org/ItemListOrderAscending",
+
+        itemListElement: serviceItems.map((service, index) => {
+          const serviceUrl = toAbsoluteUrl(service.url);
+
+          return {
+            "@type": "ListItem",
+            position: index + 1,
+
+            item: {
+              "@type": "Service",
+              "@id": `${serviceUrl}#service`,
+
+              name: service.name,
+              url: serviceUrl,
+
+              ...(service.description && {
+                description: service.description,
+              }),
+
+              ...(service.image && {
+                image: toAbsoluteUrl(service.image),
+              }),
+
+              provider: {
+                "@id": organizationId,
+              },
+
+              areaServed: {
+                "@type": "City",
+                name: "مكة المكرمة",
+              },
+            },
+          };
+        }),
+      }
+    : null;
 const schema = {
   "@context": "https://schema.org",
 
@@ -315,15 +402,13 @@ const schema = {
     businessImageNode,
     websiteNode,
 
-    ...(primaryImageNode
-      ? [primaryImageNode]
-      : []),
+    ...(primaryImageNode ? [primaryImageNode] : []),
 
     webpageNode,
 
-    ...(breadcrumbNode
-      ? [breadcrumbNode]
-      : []),
+    ...(breadcrumbNode ? [breadcrumbNode] : []),
+    ...(collectionItemListNode ? [collectionItemListNode] : []),
+    ...(servicesItemListNode ? [servicesItemListNode] : []),
   ],
 };
 ---

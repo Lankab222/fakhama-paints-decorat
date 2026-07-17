@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/common/PageHero.astro";
 import SiteSchema from "../../components/schema/SiteSchema.astro";
+import { siteConfig } from "../../config/site";
 const services = (await getCollection("services"))
   .filter((service) => !service.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
@@ -12,47 +13,60 @@ const services = (await getCollection("services"))
   title="خدمات الدهانات والديكورات التي نقدمها"
   description="تعرف على خدمات دهانات وديكورات الفخامة في الدهانات الداخلية والخارجية، والديكورات، والعوازل، والترميمات بمكة المكرمة."
 >
-<Fragment slot="head">
+  <Fragment slot="head">
     <SiteSchema
-  siteName="دهانات وديكورات الفخامة"
-  siteUrl="https://alfakhama.site"
-  siteDescription="تنفيذ أعمال الدهانات والديكورات والعوازل والترميمات في مكة المكرمة."
-
-  title="خدماتنا  | دهانات وديكورات الفخامة"
-  description="تعرف على خبرة دهانات وديكورات الفخامة وخدماتنا في مكة المكرمة."
-
-  phone="+966543441970"
-
-  address={{
-    addressLocality: "مكة المكرمة",
-    addressRegion: "مكة المكرمة",
-    addressCountry: "SA",
-    streetAddress: "العزيزية",
-    postalCode: "12455",
-  }}
-
-  pageType="CollectionPage"
-
-  breadcrumbs={[
+      {...siteConfig}
+      title="خدماتنا  | دهانات وديكورات الفخامة"
+      description="تعرف على خدمات الدهانات الداخلية والخارجية وبديل الرخام والخشب والعوازل وأرضيات الإيبوكسي وورق الجدران في مكة المكرمة."
+      pageType="CollectionPage"
+      breadcrumbs={[
+        {
+          name: "الرئيسية",
+          url: "/",
+        },
+        {
+          name: "خدماتنا",
+          url: "/services/",
+        },
+      ]}
+      serviceItems={[
     {
-      name: "الرئيسية",
-      url: "/",
+      name: "الدهانات الداخلية والخارجية",
+      url: "/services/paints/",
+      description:
+        "تنفيذ الدهانات الداخلية والخارجية والديكورات الحديثة للمنازل والفلل والمكاتب في مكة المكرمة.",
+      image: "/uploads/دهانات-داخلية-الرياض-14.webp",
     },
     {
-      name: "خدماتنا",
-      url: "/services/",
+      name: "بديل الرخام وبديل الخشب",
+      url: "/services/marble-alternative/",
+      description:
+        "تركيب بديل الرخام وبديل الخشب عالي الجودة للمنازل والفلل والمكاتب، مع تشكيلة واسعة من الألوان والتصاميم.",
+      image: "/uploads/بديل-خشب-في-الرياض-28.webp",
+    },
+    {
+      name: "العوازل وأرضيات الإيبوكسي",
+      url: "/services/awazel-trmymat/",
+      description:
+        "تنفيذ العزل المائي والحراري للأسطح للمساعدة في منع التسربات وتقليل انتقال الحرارة.",
+      image: "/uploads/عوازل-اسطح-في-الرياض-18.webp",
+    },
+    {
+      name: "ورق الجدران والديكورات الجدارية",
+      url: "/services/wallpaper/",
+      description:
+        "تركيب ورق الجدران والديكورات الجدارية الحديثة لإضفاء لمسة جمالية على المنازل والمكاتب.",
+      image: "/uploads/ورق-جدران-الرياض-5.webp",
     },
   ]}
-/>
-     
-     
+    />
   </Fragment>
   <main id="main-content">
     <PageHero
-  eyebrow="خدماتنا"
-  title="خدمات الدهانات والديكورات التي نقدمها"
-  description="تعرف على خدمات دهانات وديكورات الفخامة في الدهانات الداخلية والخارجية، والديكورات، والعوازل، والترميمات بمكة المكرمة."
-/>
+      eyebrow="خدماتنا"
+      title="خدمات الدهانات والديكورات التي نقدمها"
+      description="تعرف على خدمات دهانات وديكورات الفخامة في الدهانات الداخلية والخارجية، والديكورات، والعوازل، والترميمات بمكة المكرمة."
+    />
 
     <section class="section">
       <div class="container">
@@ -118,34 +132,30 @@ const services = (await getCollection("services"))
 </BaseLayout>
 
 <style>
-  
-.service-card,
-.project-card,
-.post-card {
-  transition:
-    transform var(--transition),
-    box-shadow var(--transition),
-    border-color var(--transition);
-}
+  .service-card,
+  .project-card,
+  .post-card {
+    transition:
+      transform var(--transition),
+      box-shadow var(--transition),
+      border-color var(--transition);
+  }
 
-.service-card:hover,
-.project-card:hover,
-.post-card:hover {
-  transform: translateY(-4px);
-  border-color:
-    color-mix(
+  .service-card:hover,
+  .project-card:hover,
+  .post-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(
       in srgb,
       var(--color-primary) 28%,
       var(--color-border)
     );
-  box-shadow: var(--shadow-md);
-}
+    box-shadow: var(--shadow-md);
+  }
   .eyebrow {
     color: var(--color-primary);
     font-weight: 700;
   }
-
-
 
   .services-grid {
     display: grid;
